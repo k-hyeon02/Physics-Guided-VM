@@ -1,0 +1,59 @@
+job_id=8225
+hostname=node02
+start_time=2026-07-20T01:54:53+09:00
+Mon Jul 20 01:54:53 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 570.124.06             Driver Version: 570.124.06     CUDA Version: 12.8     |
+|-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA GeForce RTX 3090        On  |   00000000:17:00.0 Off |                  N/A |
+| 40%   22C    P8             29W /  345W |       2MiB /  24576MiB |      0%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+                                                                                         
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+device=cuda
+loaded checkpoints/agg_rl_FM_vectorized_20260716/best.pt epoch=293
+
+total 1-speaker samples analyzed: 66
+
+=== per channel count ===
+ch= 4 n=  9 mean_err= 51.39 median= 45.22 frac<10deg=  0.0%
+ch= 5 n= 11 mean_err= 39.09 median= 19.90 frac<10deg= 18.2%
+ch= 6 n=  8 mean_err= 23.41 median= 10.48 frac<10deg= 50.0%
+ch= 7 n=  7 mean_err= 29.30 median= 19.63 frac<10deg= 14.3%
+ch= 8 n=  3 mean_err= 64.56 median= 45.04 frac<10deg=  0.0%
+ch= 9 n=  5 mean_err= 24.15 median= 18.98 frac<10deg= 40.0%
+ch=10 n=  7 mean_err= 25.76 median= 28.07 frac<10deg= 28.6%
+ch=11 n=  9 mean_err= 37.06 median= 21.01 frac<10deg= 22.2%
+ch=12 n=  7 mean_err= 21.99 median= 10.20 frac<10deg= 42.9%
+
+=== per mic_clipped flag ===
+clipped=False n= 66 mean_err= 34.35 median= 20.46
+clipped=True: n=0
+
+=== best 5 samples (ch, clipped, err, pred_az, pred_el, true_az, true_el) ===
+(12, False, 1.7829191990322986, np.float32(174.16621), np.float32(98.908714), np.float32(174.08846), np.float32(98.460884))
+(5, False, 4.622910992812173, np.float32(293.42007), np.float32(93.50094), np.float32(293.8713), np.float32(92.58934))
+(7, False, 5.075367030925191, np.float32(185.44943), np.float32(90.08397), np.float32(188.11371), np.float32(95.7821))
+(11, False, 5.312283945503739, np.float32(122.066185), np.float32(121.3506), np.float32(121.418205), np.float32(123.98551))
+(9, False, 5.408749503024081, np.float32(258.4652), np.float32(112.36818), np.float32(266.40576), np.float32(115.02621))
+
+=== worst 5 samples (ch, clipped, err, pred_az, pred_el, true_az, true_el) ===
+(6, False, 88.73359526297368, np.float32(262.78116), np.float32(88.79633), np.float32(173.78586), np.float32(98.079056))
+(4, False, 109.28492086373487, np.float32(221.27184), np.float32(114.75011), np.float32(128.99905), np.float32(69.16107))
+(5, False, 115.41999889405305, np.float32(6.7015357), np.float32(81.03461), np.float32(103.81092), np.float32(88.02068))
+(11, False, 126.36888184116056, np.float32(265.69815), np.float32(91.87567), np.float32(126.32608), np.float32(98.31524))
+(8, False, 134.2929892730713, np.float32(350.6896), np.float32(91.76366), np.float32(179.92673), np.float32(59.289486))
+
+azimuth diff (pred-true) mean=6.00 std=42.51 (계통적 offset이면 mean이 0에서 크게 벗어남, 랜덤이면 mean~0 std가 큼)
+end_time=2026-07-20T01:55:18+09:00

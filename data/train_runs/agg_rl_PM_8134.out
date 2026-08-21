@@ -1,0 +1,55 @@
+job_id=8134
+job_name=agg_rl_PM
+hostname=node03
+start_time=2026-07-08T19:48:10+09:00
+cuda_visible_devices=0
+slurm_cpus_per_task=24
+slurm_mem_per_node=49152
+Wed Jul  8 19:48:10 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 570.124.06             Driver Version: 570.124.06     CUDA Version: 12.8     |
+|-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA GeForce RTX 3090        On  |   00000000:17:00.0 Off |                  N/A |
+| 40%   30C    P8             22W /  345W |       2MiB /  24576MiB |      0%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+                                                                                         
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+launch_command=bash scripts/train_model.sh 
+repo_root=/home/s2021102349/Audio-Geometry-Grid_Representation-Learning
+run_name=agg_rl_PM_paper
+save_dir=/home/s2021102349/Audio-Geometry-Grid_Representation-Learning/checkpoints/agg_rl_PM_paper
+log_file=/home/s2021102349/Audio-Geometry-Grid_Representation-Learning/data/train_runs/agg_rl_PM_paper/train.log
+mpe_type=PM
+start_time=2026-07-08T19:48:12+09:00
+command=python train.py --librispeech_train /home/s2021102349/Audio-Geometry-Grid_Representation-Learning/datasets/librispeech/LibriSpeech/train-clean-100 --librispeech_val /home/s2021102349/Audio-Geometry-Grid_Representation-Learning/datasets/librispeech/LibriSpeech/test-clean --ms_snsd_train /home/s2021102349/Audio-Geometry-Grid_Representation-Learning/datasets/ms-snsd/MS-SNSD/noise_train --ms_snsd_val /home/s2021102349/Audio-Geometry-Grid_Representation-Learning/datasets/ms-snsd/MS-SNSD/noise_test --mpe_type PM --save_dir /home/s2021102349/Audio-Geometry-Grid_Representation-Learning/checkpoints/agg_rl_PM_paper --batch_size 16 --num_workers 8 --prefetch_factor 1 --log_interval 0 --train_samples_per_epoch 28800 --fixed_suite_samples 2000 --dynamic_samples_per_channel 300 --seed 42 
+device=cuda
+model=AGG_RL(PM) params=2,788,836
+train_speech=28539 train_noise=128
+[19:54:18] epoch=001 stage=1 gamma=[32.0, 12.0, 5.0] train=0.9733 val:stage1=0.9368 layers=[0.7165, 0.2041, 0.0527]
+[20:00:32] epoch=002 stage=1 gamma=[32.0, 12.0, 5.0] train=0.9445 val:stage1=0.9262 layers=[0.6965, 0.1973, 0.0508]
+[20:06:48] epoch=003 stage=1 gamma=[32.0, 12.0, 5.0] train=0.9371 val:stage1=0.9144 layers=[0.6912, 0.1955, 0.0504]
+[20:13:05] epoch=004 stage=1 gamma=[32.0, 12.0, 5.0] train=0.9316 val:stage1=0.9149 layers=[0.6878, 0.1938, 0.05]
+[20:19:22] epoch=005 stage=1 gamma=[32.0, 12.0, 5.0] train=0.9308 val:stage1=0.9157 layers=[0.6869, 0.1938, 0.0501]
+[20:25:40] epoch=006 stage=1 gamma=[32.0, 12.0, 5.0] train=0.9229 val:stage1=0.9127 layers=[0.6817, 0.1917, 0.0496]
+[20:31:55] epoch=007 stage=1 gamma=[32.0, 12.0, 5.0] train=0.9227 val:stage1=0.9017 layers=[0.6815, 0.1916, 0.0495]
+[20:38:09] epoch=008 stage=1 gamma=[32.0, 12.0, 5.0] train=0.9221 val:stage1=0.9026 layers=[0.6811, 0.1914, 0.0495]
+[20:44:23] epoch=009 stage=1 gamma=[32.0, 12.0, 5.0] train=0.9205 val:stage1=0.9037 layers=[0.6801, 0.191, 0.0494]
+[20:50:35] epoch=010 stage=1 gamma=[32.0, 12.0, 5.0] train=0.9192 val:stage1=0.9005 layers=[0.679, 0.1908, 0.0494]
+[21:04:42] epoch=011 stage=2 gamma=[32.0, 12.0, 5.0] train=0.9329 val:stage2=0.9171 layers=[0.6886, 0.1942, 0.0501]
+[21:18:39] epoch=012 stage=2 gamma=[32.0, 12.0, 5.0] train=0.9302 val:stage2=0.9204 layers=[0.6864, 0.1938, 0.05]
+[21:32:51] epoch=013 stage=2 gamma=[32.0, 12.0, 5.0] train=0.9248 val:stage2=0.9152 layers=[0.6829, 0.1923, 0.0496]
+[21:46:58] epoch=014 stage=2 gamma=[32.0, 12.0, 5.0] train=0.9257 val:stage2=0.9113 layers=[0.6834, 0.1926, 0.0497]
+[22:01:10] epoch=015 stage=2 gamma=[32.0, 12.0, 5.0] train=0.9237 val:stage2=0.9087 layers=[0.6821, 0.192, 0.0496]
+[22:15:16] epoch=016 stage=2 gamma=[32.0, 12.0, 5.0] train=0.9203 val:stage2=0.9097 layers=[0.6795, 0.1913, 0.0495]
+[22:29:21] epoch=017 stage=2 gamma=[32.0, 12.0, 5.0] train=0.9183 val:stage2=0.9068 layers=[0.6782, 0.1908, 0.0493]

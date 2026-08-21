@@ -1,0 +1,1242 @@
+job_id=8218
+job_name=agg_rl_FM_vectorized_20260716
+hostname=node04
+start_time=2026-07-16T16:34:49+09:00
+cuda_visible_devices=0
+slurm_cpus_per_task=16
+slurm_mem_per_node=49152
+Thu Jul 16 16:34:49 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 570.124.06             Driver Version: 570.124.06     CUDA Version: 12.8     |
+|-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA GeForce RTX 3090        On  |   00000000:17:00.0 Off |                  N/A |
+| 39%   31C    P8             18W /  345W |       2MiB /  24576MiB |      0%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+                                                                                         
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+launch_command=bash scripts/train_model.sh 
+=== train attempt=1/200 at 2026-07-16T16:34:50+09:00 ===
+repo_root=/home/s2021102349/Audio-Geometry-Grid_Representation-Learning
+run_name=agg_rl_FM_vectorized_20260716
+save_dir=/home/s2021102349/Audio-Geometry-Grid_Representation-Learning/checkpoints/agg_rl_FM_vectorized_20260716
+log_file=/home/s2021102349/Audio-Geometry-Grid_Representation-Learning/data/train_runs/agg_rl_FM_vectorized_20260716/train.log
+mpe_type=FM
+start_time=2026-07-16T16:34:51+09:00
+command=python train.py --librispeech_train /home/s2021102349/Audio-Geometry-Grid_Representation-Learning/datasets/librispeech/LibriSpeech/train-clean-100 --librispeech_val /home/s2021102349/Audio-Geometry-Grid_Representation-Learning/datasets/librispeech/LibriSpeech/test-clean --ms_snsd_train /home/s2021102349/Audio-Geometry-Grid_Representation-Learning/datasets/ms-snsd/MS-SNSD/noise_train --ms_snsd_val /home/s2021102349/Audio-Geometry-Grid_Representation-Learning/datasets/ms-snsd/MS-SNSD/noise_test --mpe_type FM --save_dir /home/s2021102349/Audio-Geometry-Grid_Representation-Learning/checkpoints/agg_rl_FM_vectorized_20260716 --batch_size 16 --num_workers 16 --prefetch_factor 1 --log_interval 0 --train_samples_per_epoch 28800 --fixed_suite_samples 2000 --dynamic_samples_per_channel 300 --seed 42 
+device=cuda
+model=AGG_RL(FM) params=2,788,836
+train_speech=28539 train_noise=128
+[TIMING] epoch=001 train data_wait_sec=33.1 compute_sec=290.4 batches=1800
+[TIMING] epoch=001 val:stage1 data_wait_sec=40.0 compute_sec=6.4 batches=125
+[TIMING] epoch=001 train_sec=325.2 val_sec=48.0
+[16:41:08] epoch=001 stage=1 gamma=[32.0, 12.0, 5.0] train=1.1193 val:stage1=1.1013 layers=[0.8, 0.2528, 0.0665]
+[TIMING] epoch=002 train data_wait_sec=33.4 compute_sec=293.0 batches=1800
+[TIMING] epoch=002 val:stage1 data_wait_sec=39.6 compute_sec=6.4 batches=125
+[TIMING] epoch=002 train_sec=328.0 val_sec=47.6
+[16:47:23] epoch=002 stage=1 gamma=[32.0, 12.0, 5.0] train=1.1104 val:stage1=1.0963 layers=[0.7947, 0.2502, 0.0655]
+[TIMING] epoch=003 train data_wait_sec=34.6 compute_sec=293.7 batches=1800
+[TIMING] epoch=003 val:stage1 data_wait_sec=38.9 compute_sec=6.4 batches=125
+[TIMING] epoch=003 train_sec=330.0 val_sec=47.0
+[16:53:41] epoch=003 stage=1 gamma=[32.0, 12.0, 5.0] train=1.1066 val:stage1=1.0855 layers=[0.7908, 0.2501, 0.0657]
+[TIMING] epoch=004 train data_wait_sec=33.3 compute_sec=292.5 batches=1800
+[TIMING] epoch=004 val:stage1 data_wait_sec=38.2 compute_sec=6.4 batches=125
+[TIMING] epoch=004 train_sec=327.4 val_sec=46.3
+[16:59:55] epoch=004 stage=1 gamma=[32.0, 12.0, 5.0] train=1.0964 val:stage1=1.0770 layers=[0.7845, 0.2465, 0.0654]
+[TIMING] epoch=005 train data_wait_sec=33.0 compute_sec=292.7 batches=1800
+[TIMING] epoch=005 val:stage1 data_wait_sec=37.8 compute_sec=6.4 batches=125
+[TIMING] epoch=005 train_sec=327.4 val_sec=45.9
+[17:06:08] epoch=005 stage=1 gamma=[32.0, 12.0, 5.0] train=1.0934 val:stage1=1.0742 layers=[0.7819, 0.2459, 0.0656]
+[TIMING] epoch=006 train data_wait_sec=33.0 compute_sec=292.5 batches=1800
+[TIMING] epoch=006 val:stage1 data_wait_sec=37.8 compute_sec=6.3 batches=125
+[TIMING] epoch=006 train_sec=327.2 val_sec=45.8
+[17:12:21] epoch=006 stage=1 gamma=[32.0, 12.0, 5.0] train=1.0876 val:stage1=1.0778 layers=[0.7785, 0.2439, 0.0651]
+[TIMING] epoch=007 train data_wait_sec=32.7 compute_sec=292.7 batches=1800
+[TIMING] epoch=007 val:stage1 data_wait_sec=37.8 compute_sec=6.4 batches=125
+[TIMING] epoch=007 train_sec=327.1 val_sec=45.9
+[17:18:35] epoch=007 stage=1 gamma=[32.0, 12.0, 5.0] train=1.0812 val:stage1=1.0649 layers=[0.7726, 0.2435, 0.0651]
+[TIMING] epoch=008 train data_wait_sec=32.8 compute_sec=293.2 batches=1800
+[TIMING] epoch=008 val:stage1 data_wait_sec=37.4 compute_sec=6.4 batches=125
+[TIMING] epoch=008 train_sec=327.6 val_sec=45.4
+[17:24:48] epoch=008 stage=1 gamma=[32.0, 12.0, 5.0] train=1.0731 val:stage1=1.0562 layers=[0.7673, 0.2414, 0.0644]
+[TIMING] epoch=009 train data_wait_sec=33.4 compute_sec=293.4 batches=1800
+[TIMING] epoch=009 val:stage1 data_wait_sec=38.8 compute_sec=6.4 batches=125
+[TIMING] epoch=009 train_sec=328.5 val_sec=46.9
+[17:31:03] epoch=009 stage=1 gamma=[32.0, 12.0, 5.0] train=1.0654 val:stage1=1.0522 layers=[0.7634, 0.2385, 0.0635]
+[TIMING] epoch=010 train data_wait_sec=33.7 compute_sec=293.2 batches=1800
+[TIMING] epoch=010 val:stage1 data_wait_sec=39.4 compute_sec=6.4 batches=125
+[TIMING] epoch=010 train_sec=328.5 val_sec=47.5
+[17:37:20] epoch=010 stage=1 gamma=[32.0, 12.0, 5.0] train=1.0636 val:stage1=1.0429 layers=[0.762, 0.2381, 0.0634]
+[TIMING] epoch=011 train data_wait_sec=33.0 compute_sec=293.4 batches=1800
+[TIMING] epoch=011 val:stage2 data_wait_sec=39.6 compute_sec=6.4 batches=125
+[TIMING] epoch=011 train_sec=328.1 val_sec=47.6
+[17:43:36] epoch=011 stage=2 gamma=[32.0, 12.0, 5.0] train=1.0726 val:stage2=1.0549 layers=[0.7682, 0.2407, 0.0637]
+[TIMING] epoch=012 train data_wait_sec=34.3 compute_sec=293.5 batches=1800
+[TIMING] epoch=012 val:stage2 data_wait_sec=40.0 compute_sec=6.4 batches=125
+[TIMING] epoch=012 train_sec=329.3 val_sec=48.0
+[17:49:53] epoch=012 stage=2 gamma=[32.0, 12.0, 5.0] train=1.0658 val:stage2=1.0458 layers=[0.7638, 0.2387, 0.0633]
+[TIMING] epoch=013 train data_wait_sec=33.0 compute_sec=293.6 batches=1800
+[TIMING] epoch=013 val:stage2 data_wait_sec=39.2 compute_sec=6.4 batches=125
+[TIMING] epoch=013 train_sec=328.3 val_sec=47.2
+[17:56:09] epoch=013 stage=2 gamma=[32.0, 12.0, 5.0] train=1.0624 val:stage2=1.0446 layers=[0.7615, 0.2378, 0.0631]
+[TIMING] epoch=014 train data_wait_sec=33.0 compute_sec=293.2 batches=1800
+[TIMING] epoch=014 val:stage2 data_wait_sec=38.9 compute_sec=6.4 batches=125
+[TIMING] epoch=014 train_sec=327.8 val_sec=46.9
+[18:02:24] epoch=014 stage=2 gamma=[32.0, 12.0, 5.0] train=1.0566 val:stage2=1.0409 layers=[0.7578, 0.2361, 0.0627]
+[TIMING] epoch=015 train data_wait_sec=32.9 compute_sec=292.8 batches=1800
+[TIMING] epoch=015 val:stage2 data_wait_sec=38.5 compute_sec=6.3 batches=125
+[TIMING] epoch=015 train_sec=327.3 val_sec=46.5
+[18:08:38] epoch=015 stage=2 gamma=[32.0, 12.0, 5.0] train=1.0564 val:stage2=1.0401 layers=[0.7573, 0.2363, 0.0628]
+[TIMING] epoch=016 train data_wait_sec=32.9 compute_sec=293.5 batches=1800
+[TIMING] epoch=016 val:stage2 data_wait_sec=37.9 compute_sec=6.3 batches=125
+[TIMING] epoch=016 train_sec=328.0 val_sec=45.8
+[18:14:52] epoch=016 stage=2 gamma=[32.0, 12.0, 5.0] train=1.0521 val:stage2=1.0371 layers=[0.7545, 0.2351, 0.0625]
+[TIMING] epoch=017 train data_wait_sec=33.3 compute_sec=292.5 batches=1800
+[TIMING] epoch=017 val:stage2 data_wait_sec=37.8 compute_sec=6.2 batches=125
+[TIMING] epoch=017 train_sec=327.5 val_sec=45.7
+[18:21:05] epoch=017 stage=2 gamma=[32.0, 12.0, 5.0] train=1.0493 val:stage2=1.0345 layers=[0.7528, 0.2342, 0.0623]
+[TIMING] epoch=018 train data_wait_sec=33.1 compute_sec=292.5 batches=1800
+[TIMING] epoch=018 val:stage2 data_wait_sec=38.7 compute_sec=6.3 batches=125
+[TIMING] epoch=018 train_sec=327.2 val_sec=46.7
+[18:27:19] epoch=018 stage=2 gamma=[32.0, 12.0, 5.0] train=1.0473 val:stage2=1.0339 layers=[0.7512, 0.2338, 0.0623]
+[TIMING] epoch=019 train data_wait_sec=33.5 compute_sec=293.3 batches=1800
+[TIMING] epoch=019 val:stage2 data_wait_sec=39.7 compute_sec=6.4 batches=125
+[TIMING] epoch=019 train_sec=328.5 val_sec=47.7
+[18:33:36] epoch=019 stage=2 gamma=[32.0, 12.0, 5.0] train=1.0414 val:stage2=1.0269 layers=[0.7477, 0.2319, 0.0618]
+[TIMING] epoch=020 train data_wait_sec=33.4 compute_sec=292.3 batches=1800
+[TIMING] epoch=020 val:stage2 data_wait_sec=40.1 compute_sec=6.3 batches=125
+[TIMING] epoch=020 train_sec=327.4 val_sec=48.1
+[18:39:52] epoch=020 stage=2 gamma=[32.0, 12.0, 5.0] train=1.0417 val:stage2=1.0277 layers=[0.7477, 0.2321, 0.0619]
+[TIMING] epoch=021 train data_wait_sec=33.4 compute_sec=612.5 batches=1800
+[TIMING] epoch=021 val:stage3 data_wait_sec=47.1 compute_sec=12.3 batches=162
+[TIMING] epoch=021 train_sec=647.6 val_sec=61.1
+[18:51:41] epoch=021 stage=3 gamma=[32.0, 12.0, 5.0] train=1.0330 val:stage3=1.0165 layers=[0.7416, 0.2299, 0.0615]
+[TIMING] epoch=022 train data_wait_sec=33.9 compute_sec=607.7 batches=1800
+[TIMING] epoch=022 val:stage3 data_wait_sec=45.6 compute_sec=12.2 batches=162
+[TIMING] epoch=022 train_sec=643.1 val_sec=59.4
+[19:03:23] epoch=022 stage=3 gamma=[32.0, 12.0, 5.0] train=1.0297 val:stage3=1.0130 layers=[0.7395, 0.2289, 0.0613]
+[TIMING] epoch=023 train data_wait_sec=33.8 compute_sec=617.0 batches=1800
+[TIMING] epoch=023 val:stage3 data_wait_sec=47.0 compute_sec=12.3 batches=162
+[TIMING] epoch=023 train_sec=652.4 val_sec=60.9
+[19:15:17] epoch=023 stage=3 gamma=[32.0, 12.0, 5.0] train=1.0228 val:stage3=1.0114 layers=[0.7354, 0.2268, 0.0607]
+[TIMING] epoch=024 train data_wait_sec=33.8 compute_sec=615.8 batches=1800
+[TIMING] epoch=024 val:stage3 data_wait_sec=45.7 compute_sec=12.3 batches=162
+[TIMING] epoch=024 train_sec=651.2 val_sec=59.7
+[19:27:08] epoch=024 stage=3 gamma=[32.0, 12.0, 5.0] train=1.0244 val:stage3=1.0042 layers=[0.7363, 0.2272, 0.0609]
+[TIMING] epoch=025 train data_wait_sec=33.3 compute_sec=609.0 batches=1800
+[TIMING] epoch=025 val:stage3 data_wait_sec=47.0 compute_sec=12.3 batches=162
+[TIMING] epoch=025 train_sec=643.9 val_sec=60.9
+[19:38:53] epoch=025 stage=3 gamma=[32.0, 12.0, 5.0] train=1.0220 val:stage3=1.0023 layers=[0.7348, 0.2263, 0.0609]
+[TIMING] epoch=026 train data_wait_sec=33.8 compute_sec=613.9 batches=1800
+[TIMING] epoch=026 val:stage3 data_wait_sec=45.8 compute_sec=12.6 batches=162
+[TIMING] epoch=026 train_sec=649.4 val_sec=60.0
+[19:50:43] epoch=026 stage=3 gamma=[32.0, 12.0, 5.0] train=1.0191 val:stage3=1.0025 layers=[0.7334, 0.2252, 0.0605]
+[TIMING] epoch=027 train data_wait_sec=33.7 compute_sec=612.4 batches=1800
+[TIMING] epoch=027 val:stage3 data_wait_sec=46.3 compute_sec=12.3 batches=162
+[TIMING] epoch=027 train_sec=647.7 val_sec=60.3
+[20:02:31] epoch=027 stage=3 gamma=[32.0, 12.0, 5.0] train=1.0155 val:stage3=0.9977 layers=[0.7314, 0.2239, 0.0602]
+[TIMING] epoch=028 train data_wait_sec=33.4 compute_sec=613.3 batches=1800
+[TIMING] epoch=028 val:stage3 data_wait_sec=46.2 compute_sec=12.4 batches=162
+[TIMING] epoch=028 train_sec=648.4 val_sec=60.3
+[20:14:20] epoch=028 stage=3 gamma=[32.0, 12.0, 5.0] train=1.0116 val:stage3=0.9962 layers=[0.7287, 0.2227, 0.0601]
+[TIMING] epoch=029 train data_wait_sec=34.4 compute_sec=610.7 batches=1800
+[TIMING] epoch=029 val:stage3 data_wait_sec=46.1 compute_sec=12.2 batches=162
+[TIMING] epoch=029 train_sec=646.8 val_sec=60.0
+[20:26:07] epoch=029 stage=3 gamma=[32.0, 12.0, 5.0] train=1.0056 val:stage3=0.9966 layers=[0.7254, 0.2205, 0.0596]
+[TIMING] epoch=030 train data_wait_sec=33.3 compute_sec=614.6 batches=1800
+[TIMING] epoch=030 val:stage3 data_wait_sec=46.7 compute_sec=12.4 batches=162
+[TIMING] epoch=030 train_sec=649.5 val_sec=60.8
+[20:37:57] epoch=030 stage=3 gamma=[32.0, 12.0, 5.0] train=1.0050 val:stage3=0.9976 layers=[0.7253, 0.2202, 0.0595]
+[TIMING] epoch=031 train data_wait_sec=35.2 compute_sec=609.3 batches=1800
+[TIMING] epoch=031 val:stage3 data_wait_sec=46.2 compute_sec=12.1 batches=162
+[TIMING] epoch=031 train_sec=646.1 val_sec=60.1
+[20:49:44] epoch=031 stage=3 gamma=[32.0, 12.0, 5.0] train=1.0041 val:stage3=0.9915 layers=[0.725, 0.2199, 0.0592]
+[TIMING] epoch=032 train data_wait_sec=33.1 compute_sec=609.7 batches=1800
+[TIMING] epoch=032 val:stage3 data_wait_sec=46.7 compute_sec=12.4 batches=162
+[TIMING] epoch=032 train_sec=644.5 val_sec=60.8
+[21:01:29] epoch=032 stage=3 gamma=[32.0, 12.0, 5.0] train=1.0035 val:stage3=0.9894 layers=[0.7245, 0.2198, 0.0592]
+[TIMING] epoch=033 train data_wait_sec=34.9 compute_sec=610.8 batches=1800
+[TIMING] epoch=033 val:stage3 data_wait_sec=45.8 compute_sec=12.5 batches=162
+[TIMING] epoch=033 train_sec=647.3 val_sec=60.0
+[21:13:17] epoch=033 stage=3 gamma=[32.0, 12.0, 5.0] train=1.0019 val:stage3=0.9915 layers=[0.7239, 0.2191, 0.0589]
+[TIMING] epoch=034 train data_wait_sec=33.7 compute_sec=612.9 batches=1800
+[TIMING] epoch=034 val:stage3 data_wait_sec=46.9 compute_sec=12.3 batches=162
+[TIMING] epoch=034 train_sec=648.2 val_sec=60.9
+[21:25:06] epoch=034 stage=3 gamma=[32.0, 12.0, 5.0] train=1.0040 val:stage3=0.9862 layers=[0.7252, 0.2197, 0.0591]
+[TIMING] epoch=035 train data_wait_sec=35.5 compute_sec=609.9 batches=1800
+[TIMING] epoch=035 val:stage3 data_wait_sec=45.6 compute_sec=12.3 batches=162
+[TIMING] epoch=035 train_sec=647.1 val_sec=59.5
+[21:36:53] epoch=035 stage=3 gamma=[32.0, 12.0, 5.0] train=1.0004 val:stage3=0.9833 layers=[0.7228, 0.2187, 0.0589]
+[TIMING] epoch=036 train data_wait_sec=33.8 compute_sec=620.9 batches=1800
+[TIMING] epoch=036 val:stage3 data_wait_sec=47.1 compute_sec=12.3 batches=162
+[TIMING] epoch=036 train_sec=656.3 val_sec=61.1
+[21:48:51] epoch=036 stage=3 gamma=[30.92, 11.72, 5.0] train=0.9696 val:stage3=0.9533 layers=[0.7003, 0.2106, 0.0587]
+[TIMING] epoch=037 train data_wait_sec=33.7 compute_sec=614.5 batches=1800
+[TIMING] epoch=037 val:stage3 data_wait_sec=45.5 compute_sec=12.3 batches=162
+[TIMING] epoch=037 train_sec=649.8 val_sec=59.5
+[22:00:40] epoch=037 stage=3 gamma=[29.84, 11.44, 5.0] train=0.9416 val:stage3=0.9253 layers=[0.6789, 0.2039, 0.0588]
+[TIMING] epoch=038 train data_wait_sec=34.1 compute_sec=614.9 batches=1800
+[TIMING] epoch=038 val:stage3 data_wait_sec=46.8 compute_sec=12.2 batches=162
+[TIMING] epoch=038 train_sec=650.6 val_sec=60.7
+[22:12:32] epoch=038 stage=3 gamma=[28.76, 11.16, 5.0] train=0.9054 val:stage3=0.8964 layers=[0.6517, 0.1954, 0.0584]
+[TIMING] epoch=039 train data_wait_sec=33.9 compute_sec=614.4 batches=1800
+[TIMING] epoch=039 val:stage3 data_wait_sec=45.9 compute_sec=12.4 batches=162
+[TIMING] epoch=039 train_sec=649.9 val_sec=60.0
+[22:24:22] epoch=039 stage=3 gamma=[27.68, 10.88, 5.0] train=0.8759 val:stage3=0.8618 layers=[0.6287, 0.1888, 0.0584]
+[TIMING] epoch=040 train data_wait_sec=34.4 compute_sec=617.6 batches=1800
+[TIMING] epoch=040 val:stage3 data_wait_sec=45.4 compute_sec=12.2 batches=162
+[TIMING] epoch=040 train_sec=653.6 val_sec=59.3
+[22:36:15] epoch=040 stage=3 gamma=[26.6, 10.6, 5.0] train=0.8429 val:stage3=0.8303 layers=[0.6029, 0.1816, 0.0584]
+[TIMING] epoch=041 train data_wait_sec=34.2 compute_sec=615.0 batches=1800
+[TIMING] epoch=041 val:stage3 data_wait_sec=47.7 compute_sec=12.1 batches=162
+[TIMING] epoch=041 train_sec=650.8 val_sec=61.5
+[22:48:08] epoch=041 stage=3 gamma=[25.52, 10.32, 5.0] train=0.8087 val:stage3=0.7961 layers=[0.5758, 0.1746, 0.0584]
+[TIMING] epoch=042 train data_wait_sec=33.5 compute_sec=617.3 batches=1800
+[TIMING] epoch=042 val:stage3 data_wait_sec=45.8 compute_sec=12.3 batches=162
+[TIMING] epoch=042 train_sec=652.5 val_sec=59.8
+[23:00:00] epoch=042 stage=3 gamma=[24.44, 10.04, 5.0] train=0.7744 val:stage3=0.7621 layers=[0.5483, 0.1677, 0.0584]
+[TIMING] epoch=043 train data_wait_sec=33.6 compute_sec=620.0 batches=1800
+[TIMING] epoch=043 val:stage3 data_wait_sec=46.6 compute_sec=12.3 batches=162
+[TIMING] epoch=043 train_sec=655.2 val_sec=60.4
+[23:11:56] epoch=043 stage=3 gamma=[23.36, 9.76, 5.0] train=0.7397 val:stage3=0.7250 layers=[0.5203, 0.161, 0.0584]
+[TIMING] epoch=044 train data_wait_sec=33.5 compute_sec=616.3 batches=1800
+[TIMING] epoch=044 val:stage3 data_wait_sec=46.8 compute_sec=12.3 batches=162
+[TIMING] epoch=044 train_sec=651.4 val_sec=60.7
+[23:23:49] epoch=044 stage=3 gamma=[22.28, 9.48, 5.0] train=0.7029 val:stage3=0.6928 layers=[0.491, 0.1538, 0.0582]
+[TIMING] epoch=045 train data_wait_sec=34.8 compute_sec=612.3 batches=1800
+[TIMING] epoch=045 val:stage3 data_wait_sec=45.8 compute_sec=12.2 batches=162
+[TIMING] epoch=045 train_sec=648.7 val_sec=59.7
+[23:35:37] epoch=045 stage=3 gamma=[21.2, 9.2, 5.0] train=0.6701 val:stage3=0.6549 layers=[0.4639, 0.1478, 0.0584]
+[TIMING] epoch=046 train data_wait_sec=34.3 compute_sec=617.5 batches=1800
+[TIMING] epoch=046 val:stage3 data_wait_sec=47.6 compute_sec=12.2 batches=162
+[TIMING] epoch=046 train_sec=653.4 val_sec=61.4
+[23:47:33] epoch=046 stage=3 gamma=[20.12, 8.92, 5.0] train=0.6334 val:stage3=0.6189 layers=[0.4342, 0.1409, 0.0583]
+[TIMING] epoch=047 train data_wait_sec=33.5 compute_sec=610.6 batches=1800
+[TIMING] epoch=047 val:stage3 data_wait_sec=45.7 compute_sec=12.3 batches=162
+[TIMING] epoch=047 train_sec=645.7 val_sec=59.6
+[23:59:18] epoch=047 stage=3 gamma=[19.04, 8.64, 5.0] train=0.5950 val:stage3=0.5843 layers=[0.4031, 0.1339, 0.0581]
+[TIMING] epoch=048 train data_wait_sec=33.7 compute_sec=615.6 batches=1800
+[TIMING] epoch=048 val:stage3 data_wait_sec=46.9 compute_sec=12.4 batches=162
+[TIMING] epoch=048 train_sec=650.9 val_sec=61.0
+[00:11:10] epoch=048 stage=3 gamma=[17.96, 8.36, 5.0] train=0.5598 val:stage3=0.5489 layers=[0.3741, 0.1276, 0.0581]
+[TIMING] epoch=049 train data_wait_sec=33.7 compute_sec=618.3 batches=1800
+[TIMING] epoch=049 val:stage3 data_wait_sec=45.9 compute_sec=12.4 batches=162
+[TIMING] epoch=049 train_sec=653.6 val_sec=60.0
+[00:23:04] epoch=049 stage=3 gamma=[16.88, 8.08, 5.0] train=0.5222 val:stage3=0.5119 layers=[0.3435, 0.1208, 0.0579]
+[TIMING] epoch=050 train data_wait_sec=34.0 compute_sec=621.8 batches=1800
+[TIMING] epoch=050 val:stage3 data_wait_sec=45.4 compute_sec=12.4 batches=162
+[TIMING] epoch=050 train_sec=657.5 val_sec=59.5
+[00:35:01] epoch=050 stage=3 gamma=[15.8, 7.8, 5.0] train=0.4868 val:stage3=0.4789 layers=[0.3144, 0.1146, 0.0579]
+[TIMING] epoch=051 train data_wait_sec=33.9 compute_sec=616.0 batches=1800
+[TIMING] epoch=051 val:stage3 data_wait_sec=47.7 compute_sec=12.4 batches=162
+[TIMING] epoch=051 train_sec=651.6 val_sec=61.7
+[00:46:55] epoch=051 stage=3 gamma=[14.72, 7.52, 5.0] train=0.4541 val:stage3=0.4414 layers=[0.2869, 0.109, 0.0582]
+[TIMING] epoch=052 train data_wait_sec=33.5 compute_sec=614.2 batches=1800
+[TIMING] epoch=052 val:stage3 data_wait_sec=45.3 compute_sec=12.3 batches=162
+[TIMING] epoch=052 train_sec=649.3 val_sec=59.3
+[00:58:44] epoch=052 stage=3 gamma=[13.64, 7.24, 5.0] train=0.4161 val:stage3=0.4087 layers=[0.2564, 0.1021, 0.0577]
+[TIMING] epoch=053 train data_wait_sec=33.7 compute_sec=615.4 batches=1800
+[TIMING] epoch=053 val:stage3 data_wait_sec=47.4 compute_sec=12.1 batches=162
+[TIMING] epoch=053 train_sec=650.8 val_sec=61.1
+[01:10:36] epoch=053 stage=3 gamma=[12.56, 6.96, 5.0] train=0.3825 val:stage3=0.3749 layers=[0.2285, 0.0962, 0.0577]
+[TIMING] epoch=054 train data_wait_sec=33.9 compute_sec=617.1 batches=1800
+[TIMING] epoch=054 val:stage3 data_wait_sec=45.6 compute_sec=12.2 batches=162
+[TIMING] epoch=054 train_sec=652.6 val_sec=59.5
+[01:22:29] epoch=054 stage=3 gamma=[11.48, 6.68, 5.0] train=0.3497 val:stage3=0.3434 layers=[0.2014, 0.0905, 0.0578]
+[TIMING] epoch=055 train data_wait_sec=33.7 compute_sec=616.9 batches=1800
+[TIMING] epoch=055 val:stage3 data_wait_sec=45.8 compute_sec=12.2 batches=162
+[TIMING] epoch=055 train_sec=652.3 val_sec=59.7
+[01:34:21] epoch=055 stage=3 gamma=[10.4, 6.4, 5.0] train=0.3164 val:stage3=0.3089 layers=[0.1742, 0.0845, 0.0577]
+[TIMING] epoch=056 train data_wait_sec=33.8 compute_sec=618.9 batches=1800
+[TIMING] epoch=056 val:stage3 data_wait_sec=47.4 compute_sec=12.3 batches=162
+[TIMING] epoch=056 train_sec=654.4 val_sec=61.3
+[01:46:17] epoch=056 stage=3 gamma=[9.32, 6.12, 5.0] train=0.2856 val:stage3=0.2792 layers=[0.1488, 0.079, 0.0578]
+[TIMING] epoch=057 train data_wait_sec=33.8 compute_sec=622.8 batches=1800
+[TIMING] epoch=057 val:stage3 data_wait_sec=45.6 compute_sec=12.4 batches=162
+[TIMING] epoch=057 train_sec=658.2 val_sec=59.6
+[01:58:15] epoch=057 stage=3 gamma=[8.24, 5.84, 5.0] train=0.2543 val:stage3=0.2486 layers=[0.1235, 0.0732, 0.0576]
+[TIMING] epoch=058 train data_wait_sec=33.2 compute_sec=619.0 batches=1800
+[TIMING] epoch=058 val:stage3 data_wait_sec=46.5 compute_sec=12.1 batches=162
+[TIMING] epoch=058 train_sec=653.9 val_sec=60.3
+[02:10:09] epoch=058 stage=3 gamma=[7.16, 5.56, 5.0] train=0.2246 val:stage3=0.2197 layers=[0.0996, 0.0676, 0.0574]
+[TIMING] epoch=059 train data_wait_sec=33.7 compute_sec=614.0 batches=1800
+[TIMING] epoch=059 val:stage3 data_wait_sec=46.7 compute_sec=12.3 batches=162
+[TIMING] epoch=059 train_sec=649.3 val_sec=60.7
+[02:22:00] epoch=059 stage=3 gamma=[6.08, 5.28, 5.0] train=0.1983 val:stage3=0.1936 layers=[0.078, 0.0627, 0.0576]
+[TIMING] epoch=060 train data_wait_sec=35.3 compute_sec=615.5 batches=1800
+[TIMING] epoch=060 val:stage3 data_wait_sec=45.7 compute_sec=12.3 batches=162
+[TIMING] epoch=060 train_sec=652.5 val_sec=59.7
+[02:33:52] epoch=060 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1720 val:stage3=0.1681 layers=[0.0573, 0.0573, 0.0574]
+[TIMING] epoch=061 train data_wait_sec=33.8 compute_sec=615.3 batches=1800
+[TIMING] epoch=061 val:stage3 data_wait_sec=46.9 compute_sec=12.5 batches=162
+[TIMING] epoch=061 train_sec=650.8 val_sec=61.0
+[02:45:45] epoch=061 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1726 val:stage3=0.1681 layers=[0.0575, 0.0575, 0.0576]
+[TIMING] epoch=062 train data_wait_sec=33.5 compute_sec=613.9 batches=1800
+[TIMING] epoch=062 val:stage3 data_wait_sec=45.4 compute_sec=12.3 batches=162
+[TIMING] epoch=062 train_sec=649.0 val_sec=59.4
+[02:57:33] epoch=062 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1723 val:stage3=0.1676 layers=[0.0574, 0.0574, 0.0575]
+[TIMING] epoch=063 train data_wait_sec=33.9 compute_sec=611.6 batches=1800
+[TIMING] epoch=063 val:stage3 data_wait_sec=47.1 compute_sec=12.3 batches=162
+[TIMING] epoch=063 train_sec=647.2 val_sec=61.0
+[03:09:22] epoch=063 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1720 val:stage3=0.1680 layers=[0.0573, 0.0573, 0.0574]
+[TIMING] epoch=064 train data_wait_sec=34.1 compute_sec=620.1 batches=1800
+[TIMING] epoch=064 val:stage3 data_wait_sec=45.9 compute_sec=12.4 batches=162
+[TIMING] epoch=064 train_sec=655.8 val_sec=59.9
+[03:21:18] epoch=064 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1723 val:stage3=0.1682 layers=[0.0574, 0.0574, 0.0575]
+[TIMING] epoch=065 train data_wait_sec=33.2 compute_sec=622.5 batches=1800
+[TIMING] epoch=065 val:stage3 data_wait_sec=45.6 compute_sec=12.3 batches=162
+[TIMING] epoch=065 train_sec=657.3 val_sec=59.5
+[03:33:15] epoch=065 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1716 val:stage3=0.1681 layers=[0.0571, 0.0572, 0.0572]
+[TIMING] epoch=066 train data_wait_sec=33.7 compute_sec=620.4 batches=1800
+[TIMING] epoch=066 val:stage3 data_wait_sec=47.3 compute_sec=12.1 batches=162
+[TIMING] epoch=066 train_sec=655.8 val_sec=61.1
+[03:45:12] epoch=066 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1714 val:stage3=0.1677 layers=[0.0571, 0.0572, 0.0572]
+[TIMING] epoch=067 train data_wait_sec=33.4 compute_sec=621.6 batches=1800
+[TIMING] epoch=067 val:stage3 data_wait_sec=46.1 compute_sec=12.4 batches=162
+[TIMING] epoch=067 train_sec=656.7 val_sec=60.1
+[03:57:08] epoch=067 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1705 val:stage3=0.1669 layers=[0.0568, 0.0569, 0.0568]
+[TIMING] epoch=068 train data_wait_sec=35.1 compute_sec=615.3 batches=1800
+[TIMING] epoch=068 val:stage3 data_wait_sec=45.4 compute_sec=12.2 batches=162
+[TIMING] epoch=068 train_sec=652.1 val_sec=59.3
+[04:09:00] epoch=068 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1708 val:stage3=0.1670 layers=[0.0569, 0.0569, 0.057]
+[TIMING] epoch=069 train data_wait_sec=33.9 compute_sec=613.2 batches=1800
+[TIMING] epoch=069 val:stage3 data_wait_sec=47.5 compute_sec=12.2 batches=162
+[TIMING] epoch=069 train_sec=648.8 val_sec=61.4
+[04:20:50] epoch=069 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1706 val:stage3=0.1664 layers=[0.0568, 0.0569, 0.0569]
+[TIMING] epoch=070 train data_wait_sec=33.5 compute_sec=613.4 batches=1800
+[TIMING] epoch=070 val:stage3 data_wait_sec=45.6 compute_sec=12.4 batches=162
+[TIMING] epoch=070 train_sec=648.6 val_sec=59.6
+[04:32:39] epoch=070 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1703 val:stage3=0.1669 layers=[0.0567, 0.0568, 0.0568]
+[TIMING] epoch=071 train data_wait_sec=33.2 compute_sec=617.9 batches=1800
+[TIMING] epoch=071 val:stage3 data_wait_sec=47.1 compute_sec=12.4 batches=162
+[TIMING] epoch=071 train_sec=652.7 val_sec=61.2
+[04:44:33] epoch=071 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1705 val:stage3=0.1661 layers=[0.0568, 0.0568, 0.0569]
+[TIMING] epoch=072 train data_wait_sec=34.3 compute_sec=613.3 batches=1800
+[TIMING] epoch=072 val:stage3 data_wait_sec=45.4 compute_sec=12.2 batches=162
+[TIMING] epoch=072 train_sec=649.3 val_sec=59.2
+[04:56:22] epoch=072 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1705 val:stage3=0.1667 layers=[0.0568, 0.0568, 0.0569]
+[TIMING] epoch=073 train data_wait_sec=33.8 compute_sec=615.6 batches=1800
+[TIMING] epoch=073 val:stage3 data_wait_sec=46.6 compute_sec=12.4 batches=162
+[TIMING] epoch=073 train_sec=651.1 val_sec=60.7
+[05:08:14] epoch=073 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1704 val:stage3=0.1658 layers=[0.0568, 0.0568, 0.0569]
+[TIMING] epoch=074 train data_wait_sec=33.6 compute_sec=615.5 batches=1800
+[TIMING] epoch=074 val:stage3 data_wait_sec=46.8 compute_sec=12.3 batches=162
+[TIMING] epoch=074 train_sec=650.8 val_sec=60.8
+[05:20:06] epoch=074 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1702 val:stage3=0.1658 layers=[0.0567, 0.0567, 0.0568]
+[TIMING] epoch=075 train data_wait_sec=34.5 compute_sec=613.2 batches=1800
+[TIMING] epoch=075 val:stage3 data_wait_sec=46.2 compute_sec=12.1 batches=162
+[TIMING] epoch=075 train_sec=649.3 val_sec=60.0
+[05:31:55] epoch=075 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1707 val:stage3=0.1664 layers=[0.0569, 0.0569, 0.057]
+[TIMING] epoch=076 train data_wait_sec=33.3 compute_sec=620.8 batches=1800
+[TIMING] epoch=076 val:stage3 data_wait_sec=47.7 compute_sec=12.3 batches=162
+[TIMING] epoch=076 train_sec=655.8 val_sec=61.6
+[05:43:53] epoch=076 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1691 val:stage3=0.1656 layers=[0.0563, 0.0563, 0.0564]
+[TIMING] epoch=077 train data_wait_sec=33.9 compute_sec=612.6 batches=1800
+[TIMING] epoch=077 val:stage3 data_wait_sec=45.6 compute_sec=12.5 batches=162
+[TIMING] epoch=077 train_sec=648.1 val_sec=59.8
+[05:55:41] epoch=077 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1695 val:stage3=0.1653 layers=[0.0564, 0.0565, 0.0565]
+[TIMING] epoch=078 train data_wait_sec=33.9 compute_sec=610.1 batches=1800
+[TIMING] epoch=078 val:stage3 data_wait_sec=47.3 compute_sec=12.3 batches=162
+[TIMING] epoch=078 train_sec=645.7 val_sec=61.3
+[06:07:28] epoch=078 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1697 val:stage3=0.1659 layers=[0.0565, 0.0565, 0.0566]
+[TIMING] epoch=079 train data_wait_sec=33.7 compute_sec=615.1 batches=1800
+[TIMING] epoch=079 val:stage3 data_wait_sec=45.5 compute_sec=12.2 batches=162
+[TIMING] epoch=079 train_sec=650.4 val_sec=59.4
+[06:19:18] epoch=079 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1686 val:stage3=0.1652 layers=[0.0562, 0.0562, 0.0563]
+[TIMING] epoch=080 train data_wait_sec=33.8 compute_sec=605.6 batches=1800
+[TIMING] epoch=080 val:stage3 data_wait_sec=47.8 compute_sec=12.3 batches=162
+[TIMING] epoch=080 train_sec=641.0 val_sec=61.7
+[06:31:01] epoch=080 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1691 val:stage3=0.1650 layers=[0.0563, 0.0563, 0.0564]
+[TIMING] epoch=081 train data_wait_sec=33.8 compute_sec=610.1 batches=1800
+[TIMING] epoch=081 val:stage3 data_wait_sec=45.6 compute_sec=12.2 batches=162
+[TIMING] epoch=081 train_sec=645.5 val_sec=59.5
+[06:42:46] epoch=081 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1690 val:stage3=0.1650 layers=[0.0563, 0.0563, 0.0564]
+[TIMING] epoch=082 train data_wait_sec=33.3 compute_sec=617.1 batches=1800
+[TIMING] epoch=082 val:stage3 data_wait_sec=47.0 compute_sec=12.2 batches=162
+[TIMING] epoch=082 train_sec=652.0 val_sec=60.8
+[06:54:39] epoch=082 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1688 val:stage3=0.1648 layers=[0.0562, 0.0563, 0.0563]
+[TIMING] epoch=083 train data_wait_sec=34.0 compute_sec=611.2 batches=1800
+[TIMING] epoch=083 val:stage3 data_wait_sec=45.7 compute_sec=12.2 batches=162
+[TIMING] epoch=083 train_sec=646.8 val_sec=59.6
+[07:06:26] epoch=083 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1691 val:stage3=0.1650 layers=[0.0563, 0.0564, 0.0564]
+[TIMING] epoch=084 train data_wait_sec=34.1 compute_sec=614.8 batches=1800
+[TIMING] epoch=084 val:stage3 data_wait_sec=46.5 compute_sec=12.1 batches=162
+[TIMING] epoch=084 train_sec=650.5 val_sec=60.2
+[07:18:17] epoch=084 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1685 val:stage3=0.1642 layers=[0.0561, 0.0561, 0.0562]
+[TIMING] epoch=085 train data_wait_sec=33.3 compute_sec=608.5 batches=1800
+[TIMING] epoch=085 val:stage3 data_wait_sec=46.2 compute_sec=12.3 batches=162
+[TIMING] epoch=085 train_sec=643.4 val_sec=60.2
+[07:30:01] epoch=085 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1687 val:stage3=0.1647 layers=[0.0562, 0.0562, 0.0563]
+[TIMING] epoch=086 train data_wait_sec=33.4 compute_sec=612.9 batches=1800
+[TIMING] epoch=086 val:stage3 data_wait_sec=47.2 compute_sec=12.2 batches=162
+[TIMING] epoch=086 train_sec=647.9 val_sec=61.0
+[07:41:50] epoch=086 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1688 val:stage3=0.1645 layers=[0.0562, 0.0562, 0.0563]
+[TIMING] epoch=087 train data_wait_sec=33.2 compute_sec=616.1 batches=1800
+[TIMING] epoch=087 val:stage3 data_wait_sec=46.5 compute_sec=12.3 batches=162
+[TIMING] epoch=087 train_sec=650.9 val_sec=60.3
+[07:53:41] epoch=087 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1681 val:stage3=0.1646 layers=[0.056, 0.056, 0.0561]
+[TIMING] epoch=088 train data_wait_sec=35.1 compute_sec=611.1 batches=1800
+[TIMING] epoch=088 val:stage3 data_wait_sec=46.0 compute_sec=12.3 batches=162
+[TIMING] epoch=088 train_sec=647.9 val_sec=60.0
+[08:05:29] epoch=088 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1679 val:stage3=0.1637 layers=[0.0559, 0.0559, 0.056]
+[TIMING] epoch=089 train data_wait_sec=33.6 compute_sec=616.4 batches=1800
+[TIMING] epoch=089 val:stage3 data_wait_sec=47.5 compute_sec=12.1 batches=162
+[TIMING] epoch=089 train_sec=651.6 val_sec=61.3
+[08:17:22] epoch=089 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1682 val:stage3=0.1640 layers=[0.0561, 0.0561, 0.0561]
+[TIMING] epoch=090 train data_wait_sec=34.4 compute_sec=620.1 batches=1800
+[TIMING] epoch=090 val:stage3 data_wait_sec=45.4 compute_sec=12.3 batches=162
+[TIMING] epoch=090 train_sec=656.2 val_sec=59.4
+[08:29:18] epoch=090 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1673 val:stage3=0.1638 layers=[0.0557, 0.0558, 0.0558]
+[TIMING] epoch=091 train data_wait_sec=33.9 compute_sec=616.5 batches=1800
+[TIMING] epoch=091 val:stage3 data_wait_sec=46.6 compute_sec=12.2 batches=162
+[TIMING] epoch=091 train_sec=652.0 val_sec=60.4
+[08:41:11] epoch=091 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1672 val:stage3=0.1632 layers=[0.0557, 0.0557, 0.0558]
+[TIMING] epoch=092 train data_wait_sec=34.1 compute_sec=613.2 batches=1800
+[TIMING] epoch=092 val:stage3 data_wait_sec=46.2 compute_sec=12.2 batches=162
+[TIMING] epoch=092 train_sec=648.9 val_sec=60.1
+[08:53:00] epoch=092 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1666 val:stage3=0.1632 layers=[0.0555, 0.0555, 0.0556]
+[TIMING] epoch=093 train data_wait_sec=33.7 compute_sec=610.7 batches=1800
+[TIMING] epoch=093 val:stage3 data_wait_sec=46.2 compute_sec=12.3 batches=162
+[TIMING] epoch=093 train_sec=646.0 val_sec=60.2
+[09:04:46] epoch=093 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1678 val:stage3=0.1629 layers=[0.0559, 0.0559, 0.0559]
+[TIMING] epoch=094 train data_wait_sec=33.7 compute_sec=607.0 batches=1800
+[TIMING] epoch=094 val:stage3 data_wait_sec=45.9 compute_sec=12.1 batches=162
+[TIMING] epoch=094 train_sec=642.3 val_sec=59.6
+[09:16:29] epoch=094 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1674 val:stage3=0.1625 layers=[0.0558, 0.0558, 0.0558]
+[TIMING] epoch=095 train data_wait_sec=34.1 compute_sec=617.6 batches=1800
+[TIMING] epoch=095 val:stage3 data_wait_sec=45.9 compute_sec=12.3 batches=162
+[TIMING] epoch=095 train_sec=653.3 val_sec=59.8
+[09:28:22] epoch=095 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1666 val:stage3=0.1626 layers=[0.0555, 0.0555, 0.0556]
+[TIMING] epoch=096 train data_wait_sec=34.1 compute_sec=611.4 batches=1800
+[TIMING] epoch=096 val:stage3 data_wait_sec=46.5 compute_sec=12.5 batches=162
+[TIMING] epoch=096 train_sec=647.2 val_sec=60.7
+[09:40:10] epoch=096 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1663 val:stage3=0.1624 layers=[0.0554, 0.0554, 0.0555]
+[TIMING] epoch=097 train data_wait_sec=35.1 compute_sec=613.5 batches=1800
+[TIMING] epoch=097 val:stage3 data_wait_sec=45.9 compute_sec=12.1 batches=162
+[TIMING] epoch=097 train_sec=650.3 val_sec=59.7
+[09:52:00] epoch=097 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1657 val:stage3=0.1629 layers=[0.0552, 0.0552, 0.0553]
+[TIMING] epoch=098 train data_wait_sec=34.0 compute_sec=612.5 batches=1800
+[TIMING] epoch=098 val:stage3 data_wait_sec=47.0 compute_sec=12.3 batches=162
+[TIMING] epoch=098 train_sec=648.2 val_sec=61.0
+[10:03:49] epoch=098 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1672 val:stage3=0.1634 layers=[0.0557, 0.0557, 0.0558]
+[TIMING] epoch=099 train data_wait_sec=35.7 compute_sec=612.6 batches=1800
+[TIMING] epoch=099 val:stage3 data_wait_sec=45.7 compute_sec=12.2 batches=162
+[TIMING] epoch=099 train_sec=649.9 val_sec=59.6
+[10:15:39] epoch=099 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1664 val:stage3=0.1620 layers=[0.0554, 0.0554, 0.0555]
+[TIMING] epoch=100 train data_wait_sec=33.6 compute_sec=614.6 batches=1800
+[TIMING] epoch=100 val:stage3 data_wait_sec=47.2 compute_sec=12.2 batches=162
+[TIMING] epoch=100 train_sec=649.9 val_sec=61.0
+[10:27:30] epoch=100 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1660 val:stage3=0.1628 layers=[0.0553, 0.0553, 0.0554]
+[TIMING] epoch=101 train data_wait_sec=34.2 compute_sec=608.6 batches=1800
+[TIMING] epoch=101 val:stage3 data_wait_sec=45.5 compute_sec=12.4 batches=162
+[TIMING] epoch=101 train_sec=644.4 val_sec=59.6
+[10:39:15] epoch=101 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1669 val:stage3=0.1625 layers=[0.0556, 0.0556, 0.0557]
+[TIMING] epoch=102 train data_wait_sec=34.0 compute_sec=609.4 batches=1800
+[TIMING] epoch=102 val:stage3 data_wait_sec=47.4 compute_sec=12.2 batches=162
+[TIMING] epoch=102 train_sec=645.0 val_sec=61.2
+[10:51:01] epoch=102 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1667 val:stage3=0.1622 layers=[0.0555, 0.0555, 0.0556]
+[TIMING] epoch=103 train data_wait_sec=33.7 compute_sec=612.2 batches=1800
+[TIMING] epoch=103 val:stage3 data_wait_sec=45.3 compute_sec=12.2 batches=162
+[TIMING] epoch=103 train_sec=647.6 val_sec=59.2
+[11:02:48] epoch=103 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1663 val:stage3=0.1621 layers=[0.0554, 0.0554, 0.0555]
+[TIMING] epoch=104 train data_wait_sec=34.3 compute_sec=607.6 batches=1800
+[TIMING] epoch=104 val:stage3 data_wait_sec=47.4 compute_sec=12.1 batches=162
+[TIMING] epoch=104 train_sec=643.5 val_sec=61.2
+[11:14:33] epoch=104 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1664 val:stage3=0.1619 layers=[0.0555, 0.0554, 0.0555]
+[TIMING] epoch=105 train data_wait_sec=33.7 compute_sec=611.3 batches=1800
+[TIMING] epoch=105 val:stage3 data_wait_sec=45.6 compute_sec=12.3 batches=162
+[TIMING] epoch=105 train_sec=646.6 val_sec=59.6
+[11:26:19] epoch=105 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1658 val:stage3=0.1620 layers=[0.0553, 0.0553, 0.0553]
+[TIMING] epoch=106 train data_wait_sec=34.0 compute_sec=614.1 batches=1800
+[TIMING] epoch=106 val:stage3 data_wait_sec=47.0 compute_sec=12.2 batches=162
+[TIMING] epoch=106 train_sec=649.8 val_sec=60.9
+[11:38:10] epoch=106 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1651 val:stage3=0.1611 layers=[0.055, 0.055, 0.055]
+[TIMING] epoch=107 train data_wait_sec=33.6 compute_sec=608.4 batches=1800
+[TIMING] epoch=107 val:stage3 data_wait_sec=45.2 compute_sec=12.4 batches=162
+[TIMING] epoch=107 train_sec=643.7 val_sec=59.2
+[11:49:53] epoch=107 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1659 val:stage3=0.1613 layers=[0.0553, 0.0553, 0.0553]
+[TIMING] epoch=108 train data_wait_sec=33.4 compute_sec=610.9 batches=1800
+[TIMING] epoch=108 val:stage3 data_wait_sec=47.4 compute_sec=12.3 batches=162
+[TIMING] epoch=108 train_sec=645.9 val_sec=61.3
+[12:01:41] epoch=108 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1647 val:stage3=0.1610 layers=[0.0549, 0.0549, 0.0549]
+[TIMING] epoch=109 train data_wait_sec=34.2 compute_sec=612.3 batches=1800
+[TIMING] epoch=109 val:stage3 data_wait_sec=45.9 compute_sec=12.2 batches=162
+[TIMING] epoch=109 train_sec=648.1 val_sec=59.9
+[12:13:29] epoch=109 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1655 val:stage3=0.1618 layers=[0.0551, 0.0551, 0.0552]
+[TIMING] epoch=110 train data_wait_sec=33.7 compute_sec=620.0 batches=1800
+[TIMING] epoch=110 val:stage3 data_wait_sec=46.6 compute_sec=12.3 batches=162
+[TIMING] epoch=110 train_sec=655.3 val_sec=60.5
+[12:25:25] epoch=110 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1651 val:stage3=0.1610 layers=[0.055, 0.055, 0.0551]
+[TIMING] epoch=111 train data_wait_sec=33.7 compute_sec=616.4 batches=1800
+[TIMING] epoch=111 val:stage3 data_wait_sec=46.4 compute_sec=12.4 batches=162
+[TIMING] epoch=111 train_sec=651.8 val_sec=60.6
+[12:37:17] epoch=111 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1647 val:stage3=0.1611 layers=[0.0549, 0.0549, 0.0549]
+[TIMING] epoch=112 train data_wait_sec=35.1 compute_sec=615.4 batches=1800
+[TIMING] epoch=112 val:stage3 data_wait_sec=45.6 compute_sec=12.3 batches=162
+[TIMING] epoch=112 train_sec=652.2 val_sec=59.5
+[12:49:09] epoch=112 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1647 val:stage3=0.1604 layers=[0.0549, 0.0549, 0.0549]
+[TIMING] epoch=113 train data_wait_sec=33.7 compute_sec=612.9 batches=1800
+[TIMING] epoch=113 val:stage3 data_wait_sec=47.3 compute_sec=12.2 batches=162
+[TIMING] epoch=113 train_sec=648.1 val_sec=61.2
+[13:00:59] epoch=113 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1642 val:stage3=0.1607 layers=[0.0547, 0.0547, 0.0548]
+[TIMING] epoch=114 train data_wait_sec=34.0 compute_sec=611.0 batches=1800
+[TIMING] epoch=114 val:stage3 data_wait_sec=45.3 compute_sec=12.4 batches=162
+[TIMING] epoch=114 train_sec=646.6 val_sec=59.4
+[13:12:45] epoch=114 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1655 val:stage3=0.1605 layers=[0.0552, 0.0552, 0.0552]
+[TIMING] epoch=115 train data_wait_sec=33.7 compute_sec=610.7 batches=1800
+[TIMING] epoch=115 val:stage3 data_wait_sec=47.1 compute_sec=12.3 batches=162
+[TIMING] epoch=115 train_sec=645.9 val_sec=61.0
+[13:24:32] epoch=115 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1643 val:stage3=0.1606 layers=[0.0548, 0.0548, 0.0548]
+[TIMING] epoch=116 train data_wait_sec=34.3 compute_sec=614.9 batches=1800
+[TIMING] epoch=116 val:stage3 data_wait_sec=45.5 compute_sec=12.2 batches=162
+[TIMING] epoch=116 train_sec=650.9 val_sec=59.3
+[13:36:23] epoch=116 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1638 val:stage3=0.1604 layers=[0.0546, 0.0546, 0.0546]
+[TIMING] epoch=117 train data_wait_sec=33.9 compute_sec=612.8 batches=1800
+[TIMING] epoch=117 val:stage3 data_wait_sec=46.8 compute_sec=12.4 batches=162
+[TIMING] epoch=117 train_sec=648.3 val_sec=60.7
+[13:48:12] epoch=117 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1646 val:stage3=0.1602 layers=[0.0549, 0.0549, 0.0549]
+[TIMING] epoch=118 train data_wait_sec=33.8 compute_sec=612.1 batches=1800
+[TIMING] epoch=118 val:stage3 data_wait_sec=45.9 compute_sec=12.4 batches=162
+[TIMING] epoch=118 train_sec=647.6 val_sec=60.0
+[14:00:00] epoch=118 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1635 val:stage3=0.1605 layers=[0.0545, 0.0545, 0.0545]
+[TIMING] epoch=119 train data_wait_sec=33.8 compute_sec=610.5 batches=1800
+[TIMING] epoch=119 val:stage3 data_wait_sec=46.6 compute_sec=12.4 batches=162
+[TIMING] epoch=119 train_sec=646.0 val_sec=60.5
+[14:11:46] epoch=119 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1640 val:stage3=0.1599 layers=[0.0547, 0.0547, 0.0547]
+[TIMING] epoch=120 train data_wait_sec=33.8 compute_sec=616.1 batches=1800
+[TIMING] epoch=120 val:stage3 data_wait_sec=46.1 compute_sec=12.5 batches=162
+[TIMING] epoch=120 train_sec=651.5 val_sec=60.3
+[14:23:38] epoch=120 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1635 val:stage3=0.1600 layers=[0.0545, 0.0545, 0.0545]
+[TIMING] epoch=121 train data_wait_sec=33.6 compute_sec=613.3 batches=1800
+[TIMING] epoch=121 val:stage3 data_wait_sec=45.7 compute_sec=12.5 batches=162
+[TIMING] epoch=121 train_sec=648.6 val_sec=59.8
+[14:35:27] epoch=121 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1649 val:stage3=0.1601 layers=[0.055, 0.055, 0.055]
+[TIMING] epoch=122 train data_wait_sec=34.3 compute_sec=615.9 batches=1800
+[TIMING] epoch=122 val:stage3 data_wait_sec=47.1 compute_sec=12.2 batches=162
+[TIMING] epoch=122 train_sec=651.8 val_sec=61.0
+[14:47:20] epoch=122 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1635 val:stage3=0.1597 layers=[0.0545, 0.0545, 0.0545]
+[TIMING] epoch=123 train data_wait_sec=35.9 compute_sec=615.2 batches=1800
+[TIMING] epoch=123 val:stage3 data_wait_sec=45.4 compute_sec=12.3 batches=162
+[TIMING] epoch=123 train_sec=652.8 val_sec=59.3
+[14:59:12] epoch=123 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1638 val:stage3=0.1595 layers=[0.0546, 0.0546, 0.0546]
+[TIMING] epoch=124 train data_wait_sec=33.4 compute_sec=607.7 batches=1800
+[TIMING] epoch=124 val:stage3 data_wait_sec=47.7 compute_sec=12.3 batches=162
+[TIMING] epoch=124 train_sec=642.8 val_sec=61.7
+[15:10:57] epoch=124 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1640 val:stage3=0.1592 layers=[0.0547, 0.0547, 0.0547]
+[TIMING] epoch=125 train data_wait_sec=33.6 compute_sec=612.1 batches=1800
+[TIMING] epoch=125 val:stage3 data_wait_sec=45.2 compute_sec=12.3 batches=162
+[TIMING] epoch=125 train_sec=647.3 val_sec=59.2
+[15:22:44] epoch=125 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1636 val:stage3=0.1594 layers=[0.0545, 0.0545, 0.0546]
+[TIMING] epoch=126 train data_wait_sec=33.7 compute_sec=614.2 batches=1800
+[TIMING] epoch=126 val:stage3 data_wait_sec=47.7 compute_sec=12.2 batches=162
+[TIMING] epoch=126 train_sec=649.6 val_sec=61.5
+[15:34:35] epoch=126 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1634 val:stage3=0.1599 layers=[0.0545, 0.0544, 0.0545]
+[TIMING] epoch=127 train data_wait_sec=33.4 compute_sec=611.8 batches=1800
+[TIMING] epoch=127 val:stage3 data_wait_sec=46.1 compute_sec=12.1 batches=162
+[TIMING] epoch=127 train_sec=646.8 val_sec=59.9
+[15:46:22] epoch=127 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1636 val:stage3=0.1596 layers=[0.0545, 0.0545, 0.0546]
+[TIMING] epoch=128 train data_wait_sec=34.2 compute_sec=613.0 batches=1800
+[TIMING] epoch=128 val:stage3 data_wait_sec=47.4 compute_sec=12.2 batches=162
+[TIMING] epoch=128 train_sec=648.9 val_sec=61.3
+[15:58:12] epoch=128 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1633 val:stage3=0.1593 layers=[0.0544, 0.0544, 0.0544]
+[TIMING] epoch=129 train data_wait_sec=33.6 compute_sec=610.3 batches=1800
+[TIMING] epoch=129 val:stage3 data_wait_sec=45.5 compute_sec=12.3 batches=162
+[TIMING] epoch=129 train_sec=645.6 val_sec=59.4
+[16:09:58] epoch=129 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1636 val:stage3=0.1590 layers=[0.0545, 0.0545, 0.0546]
+[TIMING] epoch=130 train data_wait_sec=33.3 compute_sec=614.7 batches=1800
+[TIMING] epoch=130 val:stage3 data_wait_sec=46.9 compute_sec=12.1 batches=162
+[TIMING] epoch=130 train_sec=649.7 val_sec=60.6
+[16:21:48] epoch=130 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1629 val:stage3=0.1591 layers=[0.0543, 0.0543, 0.0543]
+[TIMING] epoch=131 train data_wait_sec=34.4 compute_sec=615.0 batches=1800
+[TIMING] epoch=131 val:stage3 data_wait_sec=45.7 compute_sec=12.4 batches=162
+[TIMING] epoch=131 train_sec=651.0 val_sec=59.7
+[16:33:39] epoch=131 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1628 val:stage3=0.1593 layers=[0.0543, 0.0542, 0.0543]
+[TIMING] epoch=132 train data_wait_sec=34.1 compute_sec=609.8 batches=1800
+[TIMING] epoch=132 val:stage3 data_wait_sec=46.6 compute_sec=12.2 batches=162
+[TIMING] epoch=132 train_sec=645.5 val_sec=60.4
+[16:45:25] epoch=132 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1634 val:stage3=0.1585 layers=[0.0545, 0.0544, 0.0545]
+[TIMING] epoch=133 train data_wait_sec=34.1 compute_sec=610.4 batches=1800
+[TIMING] epoch=133 val:stage3 data_wait_sec=45.8 compute_sec=12.2 batches=162
+[TIMING] epoch=133 train_sec=646.1 val_sec=59.7
+[16:57:11] epoch=133 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1628 val:stage3=0.1586 layers=[0.0543, 0.0543, 0.0543]
+[TIMING] epoch=134 train data_wait_sec=33.7 compute_sec=610.2 batches=1800
+[TIMING] epoch=134 val:stage3 data_wait_sec=46.5 compute_sec=12.4 batches=162
+[TIMING] epoch=134 train_sec=645.4 val_sec=60.5
+[17:08:57] epoch=134 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1623 val:stage3=0.1583 layers=[0.0541, 0.0541, 0.0541]
+[TIMING] epoch=135 train data_wait_sec=33.9 compute_sec=607.4 batches=1800
+[TIMING] epoch=135 val:stage3 data_wait_sec=45.8 compute_sec=12.4 batches=162
+[TIMING] epoch=135 train_sec=643.0 val_sec=59.9
+[17:20:40] epoch=135 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1628 val:stage3=0.1589 layers=[0.0543, 0.0543, 0.0543]
+[TIMING] epoch=136 train data_wait_sec=33.5 compute_sec=607.7 batches=1800
+[TIMING] epoch=136 val:stage3 data_wait_sec=46.9 compute_sec=12.3 batches=162
+[TIMING] epoch=136 train_sec=642.8 val_sec=60.8
+[17:32:24] epoch=136 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1624 val:stage3=0.1584 layers=[0.0541, 0.0541, 0.0542]
+[TIMING] epoch=137 train data_wait_sec=33.9 compute_sec=610.8 batches=1800
+[TIMING] epoch=137 val:stage3 data_wait_sec=45.6 compute_sec=12.1 batches=162
+[TIMING] epoch=137 train_sec=646.3 val_sec=59.4
+[17:44:10] epoch=137 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1622 val:stage3=0.1586 layers=[0.0541, 0.0541, 0.0541]
+[TIMING] epoch=138 train data_wait_sec=33.4 compute_sec=609.1 batches=1800
+[TIMING] epoch=138 val:stage3 data_wait_sec=47.6 compute_sec=12.1 batches=162
+[TIMING] epoch=138 train_sec=644.1 val_sec=61.4
+[17:55:56] epoch=138 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1626 val:stage3=0.1582 layers=[0.0542, 0.0542, 0.0542]
+[TIMING] epoch=139 train data_wait_sec=33.4 compute_sec=614.4 batches=1800
+[TIMING] epoch=139 val:stage3 data_wait_sec=45.5 compute_sec=12.2 batches=162
+[TIMING] epoch=139 train_sec=649.5 val_sec=59.6
+[18:07:45] epoch=139 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1622 val:stage3=0.1583 layers=[0.0541, 0.054, 0.0541]
+[TIMING] epoch=140 train data_wait_sec=34.2 compute_sec=615.1 batches=1800
+[TIMING] epoch=140 val:stage3 data_wait_sec=46.3 compute_sec=12.3 batches=162
+[TIMING] epoch=140 train_sec=650.9 val_sec=60.3
+[18:19:36] epoch=140 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1623 val:stage3=0.1581 layers=[0.0541, 0.0541, 0.0541]
+[TIMING] epoch=141 train data_wait_sec=33.8 compute_sec=612.3 batches=1800
+[TIMING] epoch=141 val:stage3 data_wait_sec=46.1 compute_sec=12.3 batches=162
+[TIMING] epoch=141 train_sec=647.7 val_sec=60.1
+[18:31:24] epoch=141 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1631 val:stage3=0.1581 layers=[0.0544, 0.0543, 0.0544]
+[TIMING] epoch=142 train data_wait_sec=34.2 compute_sec=605.7 batches=1800
+[TIMING] epoch=142 val:stage3 data_wait_sec=46.9 compute_sec=12.2 batches=162
+[TIMING] epoch=142 train_sec=641.5 val_sec=60.7
+[18:43:07] epoch=142 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1621 val:stage3=0.1582 layers=[0.054, 0.054, 0.054]
+[TIMING] epoch=143 train data_wait_sec=33.5 compute_sec=609.9 batches=1800
+[TIMING] epoch=143 val:stage3 data_wait_sec=45.2 compute_sec=12.4 batches=162
+[TIMING] epoch=143 train_sec=645.1 val_sec=59.2
+[18:54:51] epoch=143 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1625 val:stage3=0.1582 layers=[0.0542, 0.0541, 0.0542]
+[TIMING] epoch=144 train data_wait_sec=33.6 compute_sec=615.5 batches=1800
+[TIMING] epoch=144 val:stage3 data_wait_sec=47.2 compute_sec=12.1 batches=162
+[TIMING] epoch=144 train_sec=650.7 val_sec=60.9
+[19:06:43] epoch=144 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1614 val:stage3=0.1580 layers=[0.0538, 0.0538, 0.0538]
+[TIMING] epoch=145 train data_wait_sec=33.5 compute_sec=611.6 batches=1800
+[TIMING] epoch=145 val:stage3 data_wait_sec=45.7 compute_sec=12.4 batches=162
+[TIMING] epoch=145 train_sec=646.7 val_sec=59.7
+[19:18:30] epoch=145 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1621 val:stage3=0.1584 layers=[0.054, 0.054, 0.054]
+[TIMING] epoch=146 train data_wait_sec=34.0 compute_sec=615.3 batches=1800
+[TIMING] epoch=146 val:stage3 data_wait_sec=46.1 compute_sec=12.2 batches=162
+[TIMING] epoch=146 train_sec=650.9 val_sec=60.0
+[19:30:21] epoch=146 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1616 val:stage3=0.1583 layers=[0.0539, 0.0539, 0.0539]
+[TIMING] epoch=147 train data_wait_sec=33.7 compute_sec=607.7 batches=1800
+[TIMING] epoch=147 val:stage3 data_wait_sec=46.3 compute_sec=12.2 batches=162
+[TIMING] epoch=147 train_sec=643.1 val_sec=60.2
+[19:42:04] epoch=147 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1624 val:stage3=0.1578 layers=[0.0541, 0.0541, 0.0542]
+[TIMING] epoch=148 train data_wait_sec=34.1 compute_sec=616.2 batches=1800
+[TIMING] epoch=148 val:stage3 data_wait_sec=46.2 compute_sec=12.2 batches=162
+[TIMING] epoch=148 train_sec=651.9 val_sec=60.0
+[19:53:56] epoch=148 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1619 val:stage3=0.1582 layers=[0.054, 0.0539, 0.054]
+[TIMING] epoch=149 train data_wait_sec=33.9 compute_sec=613.9 batches=1800
+[TIMING] epoch=149 val:stage3 data_wait_sec=46.9 compute_sec=12.3 batches=162
+[TIMING] epoch=149 train_sec=649.5 val_sec=60.8
+[20:05:47] epoch=149 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1619 val:stage3=0.1571 layers=[0.054, 0.0539, 0.054]
+[TIMING] epoch=150 train data_wait_sec=35.4 compute_sec=612.1 batches=1800
+[TIMING] epoch=150 val:stage3 data_wait_sec=44.9 compute_sec=12.5 batches=162
+[TIMING] epoch=150 train_sec=649.2 val_sec=59.0
+[20:17:35] epoch=150 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1614 val:stage3=0.1577 layers=[0.0538, 0.0538, 0.0538]
+[TIMING] epoch=151 train data_wait_sec=33.3 compute_sec=611.9 batches=1800
+[TIMING] epoch=151 val:stage3 data_wait_sec=47.6 compute_sec=12.3 batches=162
+[TIMING] epoch=151 train_sec=646.9 val_sec=61.5
+[20:29:24] epoch=151 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1609 val:stage3=0.1578 layers=[0.0536, 0.0536, 0.0537]
+[TIMING] epoch=152 train data_wait_sec=33.7 compute_sec=609.4 batches=1800
+[TIMING] epoch=152 val:stage3 data_wait_sec=45.7 compute_sec=12.3 batches=162
+[TIMING] epoch=152 train_sec=644.7 val_sec=59.8
+[20:41:09] epoch=152 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1623 val:stage3=0.1572 layers=[0.0541, 0.0541, 0.0541]
+[TIMING] epoch=153 train data_wait_sec=33.8 compute_sec=605.7 batches=1800
+[TIMING] epoch=153 val:stage3 data_wait_sec=48.0 compute_sec=12.4 batches=162
+[TIMING] epoch=153 train_sec=641.1 val_sec=62.0
+[20:52:52] epoch=153 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1617 val:stage3=0.1571 layers=[0.0539, 0.0539, 0.0539]
+[TIMING] epoch=154 train data_wait_sec=35.9 compute_sec=606.5 batches=1800
+[TIMING] epoch=154 val:stage3 data_wait_sec=45.5 compute_sec=12.2 batches=162
+[TIMING] epoch=154 train_sec=644.1 val_sec=59.4
+[21:04:36] epoch=154 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1613 val:stage3=0.1570 layers=[0.0538, 0.0538, 0.0538]
+[TIMING] epoch=155 train data_wait_sec=33.1 compute_sec=617.0 batches=1800
+[TIMING] epoch=155 val:stage3 data_wait_sec=47.4 compute_sec=12.3 batches=162
+[TIMING] epoch=155 train_sec=651.8 val_sec=61.3
+[21:16:29] epoch=155 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1603 val:stage3=0.1573 layers=[0.0534, 0.0534, 0.0535]
+[TIMING] epoch=156 train data_wait_sec=34.0 compute_sec=619.1 batches=1800
+[TIMING] epoch=156 val:stage3 data_wait_sec=45.6 compute_sec=12.2 batches=162
+[TIMING] epoch=156 train_sec=654.7 val_sec=59.6
+[21:28:23] epoch=156 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1610 val:stage3=0.1567 layers=[0.0537, 0.0537, 0.0537]
+[TIMING] epoch=157 train data_wait_sec=33.8 compute_sec=617.3 batches=1800
+[TIMING] epoch=157 val:stage3 data_wait_sec=46.3 compute_sec=12.3 batches=162
+[TIMING] epoch=157 train_sec=652.7 val_sec=60.2
+[21:40:17] epoch=157 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1610 val:stage3=0.1567 layers=[0.0537, 0.0536, 0.0537]
+[TIMING] epoch=158 train data_wait_sec=33.7 compute_sec=615.2 batches=1800
+[TIMING] epoch=158 val:stage3 data_wait_sec=46.3 compute_sec=12.4 batches=162
+[TIMING] epoch=158 train_sec=650.6 val_sec=60.4
+[21:52:08] epoch=158 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1609 val:stage3=0.1568 layers=[0.0536, 0.0536, 0.0536]
+[TIMING] epoch=159 train data_wait_sec=34.6 compute_sec=612.5 batches=1800
+[TIMING] epoch=159 val:stage3 data_wait_sec=46.0 compute_sec=12.2 batches=162
+[TIMING] epoch=159 train_sec=648.8 val_sec=59.9
+[22:03:57] epoch=159 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1609 val:stage3=0.1567 layers=[0.0536, 0.0536, 0.0537]
+[TIMING] epoch=160 train data_wait_sec=33.9 compute_sec=613.8 batches=1800
+[TIMING] epoch=160 val:stage3 data_wait_sec=47.2 compute_sec=12.3 batches=162
+[TIMING] epoch=160 train_sec=649.3 val_sec=61.1
+[22:15:47] epoch=160 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1606 val:stage3=0.1567 layers=[0.0535, 0.0535, 0.0536]
+[TIMING] epoch=161 train data_wait_sec=35.4 compute_sec=612.6 batches=1800
+[TIMING] epoch=161 val:stage3 data_wait_sec=45.7 compute_sec=12.5 batches=162
+[TIMING] epoch=161 train_sec=649.7 val_sec=59.8
+[22:27:37] epoch=161 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1603 val:stage3=0.1570 layers=[0.0534, 0.0534, 0.0535]
+[TIMING] epoch=162 train data_wait_sec=33.6 compute_sec=615.7 batches=1800
+[TIMING] epoch=162 val:stage3 data_wait_sec=47.6 compute_sec=12.3 batches=162
+[TIMING] epoch=162 train_sec=650.9 val_sec=61.5
+[22:39:30] epoch=162 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1600 val:stage3=0.1563 layers=[0.0533, 0.0533, 0.0533]
+[TIMING] epoch=163 train data_wait_sec=34.0 compute_sec=605.7 batches=1800
+[TIMING] epoch=163 val:stage3 data_wait_sec=45.8 compute_sec=12.2 batches=162
+[TIMING] epoch=163 train_sec=641.3 val_sec=59.7
+[22:51:11] epoch=163 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1609 val:stage3=0.1564 layers=[0.0536, 0.0536, 0.0536]
+[TIMING] epoch=164 train data_wait_sec=33.6 compute_sec=615.1 batches=1800
+[TIMING] epoch=164 val:stage3 data_wait_sec=47.4 compute_sec=12.4 batches=162
+[TIMING] epoch=164 train_sec=650.4 val_sec=61.5
+[23:03:03] epoch=164 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1613 val:stage3=0.1568 layers=[0.0538, 0.0537, 0.0538]
+[TIMING] epoch=165 train data_wait_sec=33.7 compute_sec=615.3 batches=1800
+[TIMING] epoch=165 val:stage3 data_wait_sec=45.8 compute_sec=12.1 batches=162
+[TIMING] epoch=165 train_sec=650.7 val_sec=59.6
+[23:14:53] epoch=165 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1610 val:stage3=0.1562 layers=[0.0537, 0.0536, 0.0537]
+[TIMING] epoch=166 train data_wait_sec=33.7 compute_sec=615.1 batches=1800
+[TIMING] epoch=166 val:stage3 data_wait_sec=46.4 compute_sec=12.1 batches=162
+[TIMING] epoch=166 train_sec=650.4 val_sec=60.1
+[23:26:44] epoch=166 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1607 val:stage3=0.1567 layers=[0.0536, 0.0535, 0.0536]
+[TIMING] epoch=167 train data_wait_sec=33.9 compute_sec=618.4 batches=1800
+[TIMING] epoch=167 val:stage3 data_wait_sec=46.5 compute_sec=12.4 batches=162
+[TIMING] epoch=167 train_sec=653.9 val_sec=60.5
+[23:38:39] epoch=167 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1607 val:stage3=0.1563 layers=[0.0536, 0.0535, 0.0536]
+[TIMING] epoch=168 train data_wait_sec=35.1 compute_sec=614.3 batches=1800
+[TIMING] epoch=168 val:stage3 data_wait_sec=45.9 compute_sec=12.4 batches=162
+[TIMING] epoch=168 train_sec=651.0 val_sec=59.9
+[23:50:30] epoch=168 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1598 val:stage3=0.1562 layers=[0.0533, 0.0532, 0.0533]
+[TIMING] epoch=169 train data_wait_sec=34.0 compute_sec=609.8 batches=1800
+[TIMING] epoch=169 val:stage3 data_wait_sec=47.6 compute_sec=12.1 batches=162
+[TIMING] epoch=169 train_sec=645.4 val_sec=61.3
+[00:02:17] epoch=169 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1605 val:stage3=0.1565 layers=[0.0535, 0.0535, 0.0535]
+[TIMING] epoch=170 train data_wait_sec=35.8 compute_sec=613.5 batches=1800
+[TIMING] epoch=170 val:stage3 data_wait_sec=45.3 compute_sec=12.3 batches=162
+[TIMING] epoch=170 train_sec=651.0 val_sec=59.2
+[00:14:07] epoch=170 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1606 val:stage3=0.1563 layers=[0.0535, 0.0535, 0.0535]
+[TIMING] epoch=171 train data_wait_sec=34.2 compute_sec=622.0 batches=1800
+[TIMING] epoch=171 val:stage3 data_wait_sec=46.7 compute_sec=12.3 batches=162
+[TIMING] epoch=171 train_sec=657.9 val_sec=60.7
+[00:26:06] epoch=171 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1604 val:stage3=0.1561 layers=[0.0535, 0.0534, 0.0535]
+[TIMING] epoch=172 train data_wait_sec=33.8 compute_sec=613.3 batches=1800
+[TIMING] epoch=172 val:stage3 data_wait_sec=45.8 compute_sec=12.4 batches=162
+[TIMING] epoch=172 train_sec=648.8 val_sec=59.8
+[00:37:55] epoch=172 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1602 val:stage3=0.1562 layers=[0.0534, 0.0534, 0.0534]
+[TIMING] epoch=173 train data_wait_sec=33.5 compute_sec=617.5 batches=1800
+[TIMING] epoch=173 val:stage3 data_wait_sec=45.8 compute_sec=12.2 batches=162
+[TIMING] epoch=173 train_sec=652.7 val_sec=59.7
+[00:49:47] epoch=173 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1604 val:stage3=0.1562 layers=[0.0535, 0.0534, 0.0535]
+[TIMING] epoch=174 train data_wait_sec=34.1 compute_sec=610.7 batches=1800
+[TIMING] epoch=174 val:stage3 data_wait_sec=46.6 compute_sec=12.4 batches=162
+[TIMING] epoch=174 train_sec=646.5 val_sec=60.6
+[01:01:35] epoch=174 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1609 val:stage3=0.1563 layers=[0.0536, 0.0536, 0.0537]
+[TIMING] epoch=175 train data_wait_sec=34.9 compute_sec=615.0 batches=1800
+[TIMING] epoch=175 val:stage3 data_wait_sec=45.7 compute_sec=12.2 batches=162
+[TIMING] epoch=175 train_sec=651.7 val_sec=59.6
+[01:13:26] epoch=175 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1613 val:stage3=0.1559 layers=[0.0538, 0.0537, 0.0538]
+[TIMING] epoch=176 train data_wait_sec=33.9 compute_sec=615.6 batches=1800
+[TIMING] epoch=176 val:stage3 data_wait_sec=47.6 compute_sec=12.4 batches=162
+[TIMING] epoch=176 train_sec=651.2 val_sec=61.7
+[01:25:19] epoch=176 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1610 val:stage3=0.1561 layers=[0.0537, 0.0536, 0.0537]
+[TIMING] epoch=177 train data_wait_sec=33.4 compute_sec=617.3 batches=1800
+[TIMING] epoch=177 val:stage3 data_wait_sec=46.1 compute_sec=12.1 batches=162
+[TIMING] epoch=177 train_sec=652.4 val_sec=59.8
+[01:37:12] epoch=177 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1599 val:stage3=0.1560 layers=[0.0533, 0.0533, 0.0533]
+[TIMING] epoch=178 train data_wait_sec=33.6 compute_sec=615.6 batches=1800
+[TIMING] epoch=178 val:stage3 data_wait_sec=46.6 compute_sec=12.4 batches=162
+[TIMING] epoch=178 train_sec=650.9 val_sec=60.6
+[01:49:03] epoch=178 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1599 val:stage3=0.1557 layers=[0.0533, 0.0533, 0.0533]
+[TIMING] epoch=179 train data_wait_sec=34.0 compute_sec=616.8 batches=1800
+[TIMING] epoch=179 val:stage3 data_wait_sec=46.6 compute_sec=12.4 batches=162
+[TIMING] epoch=179 train_sec=652.4 val_sec=60.6
+[02:00:56] epoch=179 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1606 val:stage3=0.1560 layers=[0.0535, 0.0535, 0.0536]
+[TIMING] epoch=180 train data_wait_sec=34.6 compute_sec=620.1 batches=1800
+[TIMING] epoch=180 val:stage3 data_wait_sec=45.4 compute_sec=12.2 batches=162
+[TIMING] epoch=180 train_sec=656.3 val_sec=59.3
+[02:12:52] epoch=180 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1606 val:stage3=0.1559 layers=[0.0535, 0.0535, 0.0535]
+[TIMING] epoch=181 train data_wait_sec=33.7 compute_sec=617.7 batches=1800
+[TIMING] epoch=181 val:stage3 data_wait_sec=47.2 compute_sec=12.4 batches=162
+[TIMING] epoch=181 train_sec=653.0 val_sec=61.2
+[02:24:47] epoch=181 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1592 val:stage3=0.1557 layers=[0.0531, 0.0531, 0.0531]
+[TIMING] epoch=182 train data_wait_sec=33.8 compute_sec=614.6 batches=1800
+[TIMING] epoch=182 val:stage3 data_wait_sec=45.1 compute_sec=12.3 batches=162
+[TIMING] epoch=182 train_sec=650.1 val_sec=59.1
+[02:36:36] epoch=182 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1602 val:stage3=0.1557 layers=[0.0534, 0.0534, 0.0534]
+[TIMING] epoch=183 train data_wait_sec=33.5 compute_sec=612.8 batches=1800
+[TIMING] epoch=183 val:stage3 data_wait_sec=46.6 compute_sec=12.3 batches=162
+[TIMING] epoch=183 train_sec=648.1 val_sec=60.6
+[02:48:25] epoch=183 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1607 val:stage3=0.1557 layers=[0.0536, 0.0535, 0.0536]
+[TIMING] epoch=184 train data_wait_sec=33.5 compute_sec=613.9 batches=1800
+[TIMING] epoch=184 val:stage3 data_wait_sec=45.7 compute_sec=12.3 batches=162
+[TIMING] epoch=184 train_sec=649.1 val_sec=59.6
+[03:00:14] epoch=184 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1598 val:stage3=0.1556 layers=[0.0533, 0.0532, 0.0533]
+[TIMING] epoch=185 train data_wait_sec=33.2 compute_sec=613.6 batches=1800
+[TIMING] epoch=185 val:stage3 data_wait_sec=46.4 compute_sec=12.2 batches=162
+[TIMING] epoch=185 train_sec=648.3 val_sec=60.3
+[03:12:03] epoch=185 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1593 val:stage3=0.1557 layers=[0.0531, 0.0531, 0.0531]
+[TIMING] epoch=186 train data_wait_sec=33.8 compute_sec=617.2 batches=1800
+[TIMING] epoch=186 val:stage3 data_wait_sec=46.8 compute_sec=12.5 batches=162
+[TIMING] epoch=186 train_sec=652.6 val_sec=60.9
+[03:23:56] epoch=186 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1598 val:stage3=0.1554 layers=[0.0533, 0.0532, 0.0533]
+[TIMING] epoch=187 train data_wait_sec=34.9 compute_sec=614.5 batches=1800
+[TIMING] epoch=187 val:stage3 data_wait_sec=45.3 compute_sec=12.3 batches=162
+[TIMING] epoch=187 train_sec=651.0 val_sec=59.3
+[03:35:47] epoch=187 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1594 val:stage3=0.1556 layers=[0.0531, 0.0531, 0.0531]
+[TIMING] epoch=188 train data_wait_sec=34.4 compute_sec=614.2 batches=1800
+[TIMING] epoch=188 val:stage3 data_wait_sec=47.4 compute_sec=12.2 batches=162
+[TIMING] epoch=188 train_sec=650.2 val_sec=61.2
+[03:47:39] epoch=188 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1598 val:stage3=0.1555 layers=[0.0533, 0.0532, 0.0533]
+[TIMING] epoch=189 train data_wait_sec=33.2 compute_sec=611.3 batches=1800
+[TIMING] epoch=189 val:stage3 data_wait_sec=45.6 compute_sec=12.1 batches=162
+[TIMING] epoch=189 train_sec=646.2 val_sec=59.3
+[03:59:24] epoch=189 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1597 val:stage3=0.1555 layers=[0.0532, 0.0532, 0.0532]
+[TIMING] epoch=190 train data_wait_sec=34.0 compute_sec=615.3 batches=1800
+[TIMING] epoch=190 val:stage3 data_wait_sec=47.1 compute_sec=12.3 batches=162
+[TIMING] epoch=190 train_sec=651.0 val_sec=61.1
+[04:11:16] epoch=190 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1595 val:stage3=0.1557 layers=[0.0532, 0.0531, 0.0532]
+[TIMING] epoch=191 train data_wait_sec=33.1 compute_sec=615.5 batches=1800
+[TIMING] epoch=191 val:stage3 data_wait_sec=46.2 compute_sec=12.1 batches=162
+[TIMING] epoch=191 train_sec=650.3 val_sec=60.0
+[04:23:07] epoch=191 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1595 val:stage3=0.1553 layers=[0.0532, 0.0531, 0.0532]
+[TIMING] epoch=192 train data_wait_sec=34.3 compute_sec=606.8 batches=1800
+[TIMING] epoch=192 val:stage3 data_wait_sec=47.0 compute_sec=12.1 batches=162
+[TIMING] epoch=192 train_sec=642.7 val_sec=60.8
+[04:34:51] epoch=192 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1604 val:stage3=0.1554 layers=[0.0535, 0.0534, 0.0535]
+[TIMING] epoch=193 train data_wait_sec=34.0 compute_sec=618.5 batches=1800
+[TIMING] epoch=193 val:stage3 data_wait_sec=46.2 compute_sec=12.3 batches=162
+[TIMING] epoch=193 train_sec=654.1 val_sec=60.2
+[04:46:45] epoch=193 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1600 val:stage3=0.1554 layers=[0.0533, 0.0533, 0.0534]
+[TIMING] epoch=194 train data_wait_sec=34.2 compute_sec=615.9 batches=1800
+[TIMING] epoch=194 val:stage3 data_wait_sec=46.0 compute_sec=12.1 batches=162
+[TIMING] epoch=194 train_sec=651.7 val_sec=59.8
+[04:58:37] epoch=194 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1604 val:stage3=0.1554 layers=[0.0535, 0.0534, 0.0535]
+[TIMING] epoch=195 train data_wait_sec=34.0 compute_sec=615.1 batches=1800
+[TIMING] epoch=195 val:stage3 data_wait_sec=47.7 compute_sec=12.3 batches=162
+[TIMING] epoch=195 train_sec=650.8 val_sec=61.7
+[05:10:29] epoch=195 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1597 val:stage3=0.1555 layers=[0.0533, 0.0532, 0.0533]
+[TIMING] epoch=196 train data_wait_sec=33.7 compute_sec=618.9 batches=1800
+[TIMING] epoch=196 val:stage3 data_wait_sec=45.4 compute_sec=12.3 batches=162
+[TIMING] epoch=196 train_sec=654.3 val_sec=59.4
+[05:22:23] epoch=196 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1591 val:stage3=0.1553 layers=[0.0531, 0.053, 0.0531]
+[TIMING] epoch=197 train data_wait_sec=33.8 compute_sec=606.4 batches=1800
+[TIMING] epoch=197 val:stage3 data_wait_sec=47.5 compute_sec=12.2 batches=162
+[TIMING] epoch=197 train_sec=641.8 val_sec=61.3
+[05:34:07] epoch=197 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1600 val:stage3=0.1553 layers=[0.0533, 0.0533, 0.0533]
+[TIMING] epoch=198 train data_wait_sec=33.3 compute_sec=613.9 batches=1800
+[TIMING] epoch=198 val:stage3 data_wait_sec=45.8 compute_sec=12.2 batches=162
+[TIMING] epoch=198 train_sec=648.9 val_sec=59.7
+[05:45:55] epoch=198 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1598 val:stage3=0.1554 layers=[0.0533, 0.0532, 0.0533]
+[TIMING] epoch=199 train data_wait_sec=33.4 compute_sec=609.8 batches=1800
+[TIMING] epoch=199 val:stage3 data_wait_sec=47.6 compute_sec=12.3 batches=162
+[TIMING] epoch=199 train_sec=644.8 val_sec=61.5
+[05:57:42] epoch=199 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1601 val:stage3=0.1553 layers=[0.0534, 0.0533, 0.0534]
+[TIMING] epoch=200 train data_wait_sec=34.2 compute_sec=609.5 batches=1800
+[TIMING] epoch=200 val:stage3 data_wait_sec=45.1 compute_sec=12.3 batches=162
+[TIMING] epoch=200 train_sec=645.3 val_sec=59.1
+[06:09:26] epoch=200 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1595 val:stage3=0.1553 layers=[0.0532, 0.0531, 0.0532]
+[TIMING] epoch=201 train data_wait_sec=33.5 compute_sec=614.6 batches=1800
+[TIMING] epoch=201 val:stage3 data_wait_sec=47.2 compute_sec=12.3 batches=162
+[TIMING] epoch=201 train_sec=649.7 val_sec=61.1
+[06:21:18] epoch=201 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1602 val:stage3=0.1552 layers=[0.0534, 0.0534, 0.0534]
+[TIMING] epoch=202 train data_wait_sec=34.1 compute_sec=611.7 batches=1800
+[TIMING] epoch=202 val:stage3 data_wait_sec=45.3 compute_sec=12.4 batches=162
+[TIMING] epoch=202 train_sec=647.4 val_sec=59.4
+[06:33:05] epoch=202 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1588 val:stage3=0.1553 layers=[0.0529, 0.0529, 0.0529]
+[TIMING] epoch=203 train data_wait_sec=33.5 compute_sec=616.4 batches=1800
+[TIMING] epoch=203 val:stage3 data_wait_sec=46.4 compute_sec=12.3 batches=162
+[TIMING] epoch=203 train_sec=651.6 val_sec=60.4
+[06:44:57] epoch=203 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1589 val:stage3=0.1552 layers=[0.053, 0.0529, 0.053]
+[TIMING] epoch=204 train data_wait_sec=33.6 compute_sec=609.2 batches=1800
+[TIMING] epoch=204 val:stage3 data_wait_sec=46.0 compute_sec=12.3 batches=162
+[TIMING] epoch=204 train_sec=644.5 val_sec=60.0
+[06:56:42] epoch=204 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1600 val:stage3=0.1550 layers=[0.0533, 0.0533, 0.0533]
+[TIMING] epoch=205 train data_wait_sec=33.8 compute_sec=612.7 batches=1800
+[TIMING] epoch=205 val:stage3 data_wait_sec=46.4 compute_sec=12.2 batches=162
+[TIMING] epoch=205 train_sec=648.1 val_sec=60.2
+[07:08:30] epoch=205 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1581 val:stage3=0.1552 layers=[0.0527, 0.0527, 0.0527]
+[TIMING] epoch=206 train data_wait_sec=33.4 compute_sec=613.9 batches=1800
+[TIMING] epoch=206 val:stage3 data_wait_sec=46.1 compute_sec=12.3 batches=162
+[TIMING] epoch=206 train_sec=649.0 val_sec=60.1
+[07:20:19] epoch=206 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1592 val:stage3=0.1551 layers=[0.0531, 0.0531, 0.0531]
+[TIMING] epoch=207 train data_wait_sec=33.9 compute_sec=605.8 batches=1800
+[TIMING] epoch=207 val:stage3 data_wait_sec=46.4 compute_sec=12.3 batches=162
+[TIMING] epoch=207 train_sec=641.4 val_sec=60.2
+[07:32:01] epoch=207 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1585 val:stage3=0.1551 layers=[0.0529, 0.0528, 0.0529]
+[TIMING] epoch=208 train data_wait_sec=33.6 compute_sec=616.3 batches=1800
+[TIMING] epoch=208 val:stage3 data_wait_sec=46.1 compute_sec=12.4 batches=162
+[TIMING] epoch=208 train_sec=651.6 val_sec=60.2
+[07:43:53] epoch=208 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1596 val:stage3=0.1552 layers=[0.0532, 0.0532, 0.0532]
+[TIMING] epoch=209 train data_wait_sec=34.5 compute_sec=611.5 batches=1800
+[TIMING] epoch=209 val:stage3 data_wait_sec=46.5 compute_sec=12.2 batches=162
+[TIMING] epoch=209 train_sec=647.6 val_sec=60.4
+[07:55:41] epoch=209 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1584 val:stage3=0.1551 layers=[0.0528, 0.0528, 0.0528]
+[TIMING] epoch=210 train data_wait_sec=33.2 compute_sec=609.6 batches=1800
+[TIMING] epoch=210 val:stage3 data_wait_sec=46.2 compute_sec=12.4 batches=162
+[TIMING] epoch=210 train_sec=644.5 val_sec=60.2
+[08:07:26] epoch=210 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1592 val:stage3=0.1552 layers=[0.0531, 0.053, 0.0531]
+[TIMING] epoch=211 train data_wait_sec=34.4 compute_sec=609.7 batches=1800
+[TIMING] epoch=211 val:stage3 data_wait_sec=46.2 compute_sec=12.3 batches=162
+[TIMING] epoch=211 train_sec=645.8 val_sec=60.2
+[08:19:12] epoch=211 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1583 val:stage3=0.1551 layers=[0.0528, 0.0527, 0.0528]
+[TIMING] epoch=212 train data_wait_sec=33.5 compute_sec=608.0 batches=1800
+[TIMING] epoch=212 val:stage3 data_wait_sec=45.8 compute_sec=12.4 batches=162
+[TIMING] epoch=212 train_sec=643.1 val_sec=59.8
+[08:30:55] epoch=212 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1595 val:stage3=0.1552 layers=[0.0532, 0.0531, 0.0532]
+[TIMING] epoch=213 train data_wait_sec=33.6 compute_sec=612.0 batches=1800
+[TIMING] epoch=213 val:stage3 data_wait_sec=46.4 compute_sec=12.4 batches=162
+[TIMING] epoch=213 train_sec=647.2 val_sec=60.4
+[08:42:43] epoch=213 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1584 val:stage3=0.1550 layers=[0.0528, 0.0528, 0.0528]
+[TIMING] epoch=214 train data_wait_sec=34.2 compute_sec=607.5 batches=1800
+[TIMING] epoch=214 val:stage3 data_wait_sec=45.7 compute_sec=12.3 batches=162
+[TIMING] epoch=214 train_sec=643.4 val_sec=59.6
+[08:54:26] epoch=214 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1585 val:stage3=0.1549 layers=[0.0528, 0.0528, 0.0529]
+[TIMING] epoch=215 train data_wait_sec=33.9 compute_sec=608.0 batches=1800
+[TIMING] epoch=215 val:stage3 data_wait_sec=47.2 compute_sec=12.1 batches=162
+[TIMING] epoch=215 train_sec=643.5 val_sec=61.0
+[09:06:11] epoch=215 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1592 val:stage3=0.1551 layers=[0.0531, 0.053, 0.0531]
+[TIMING] epoch=216 train data_wait_sec=33.4 compute_sec=611.3 batches=1800
+[TIMING] epoch=216 val:stage3 data_wait_sec=45.5 compute_sec=12.3 batches=162
+[TIMING] epoch=216 train_sec=646.3 val_sec=59.4
+[09:17:57] epoch=216 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1593 val:stage3=0.1551 layers=[0.0531, 0.0531, 0.0531]
+[TIMING] epoch=217 train data_wait_sec=34.0 compute_sec=612.4 batches=1800
+[TIMING] epoch=217 val:stage3 data_wait_sec=46.8 compute_sec=12.2 batches=162
+[TIMING] epoch=217 train_sec=648.1 val_sec=60.5
+[09:29:46] epoch=217 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1591 val:stage3=0.1549 layers=[0.053, 0.053, 0.053]
+[TIMING] epoch=218 train data_wait_sec=33.6 compute_sec=607.8 batches=1800
+[TIMING] epoch=218 val:stage3 data_wait_sec=45.2 compute_sec=12.4 batches=162
+[TIMING] epoch=218 train_sec=643.0 val_sec=59.1
+[09:41:28] epoch=218 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1594 val:stage3=0.1550 layers=[0.0531, 0.0531, 0.0531]
+[TIMING] epoch=219 train data_wait_sec=34.0 compute_sec=604.7 batches=1800
+[TIMING] epoch=219 val:stage3 data_wait_sec=47.4 compute_sec=12.1 batches=162
+[TIMING] epoch=219 train_sec=640.4 val_sec=61.2
+[09:53:10] epoch=219 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1587 val:stage3=0.1550 layers=[0.0529, 0.0529, 0.0529]
+[TIMING] epoch=220 train data_wait_sec=33.6 compute_sec=611.7 batches=1800
+[TIMING] epoch=220 val:stage3 data_wait_sec=45.4 compute_sec=12.2 batches=162
+[TIMING] epoch=220 train_sec=646.9 val_sec=59.3
+[10:04:56] epoch=220 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1591 val:stage3=0.1548 layers=[0.053, 0.053, 0.053]
+[TIMING] epoch=221 train data_wait_sec=33.9 compute_sec=602.3 batches=1800
+[TIMING] epoch=221 val:stage3 data_wait_sec=46.9 compute_sec=12.3 batches=162
+[TIMING] epoch=221 train_sec=637.8 val_sec=60.9
+[10:16:35] epoch=221 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1592 val:stage3=0.1550 layers=[0.0531, 0.053, 0.0531]
+[TIMING] epoch=222 train data_wait_sec=35.7 compute_sec=601.1 batches=1800
+[TIMING] epoch=222 val:stage3 data_wait_sec=45.9 compute_sec=12.3 batches=162
+[TIMING] epoch=222 train_sec=638.5 val_sec=59.8
+[10:28:14] epoch=222 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1585 val:stage3=0.1549 layers=[0.0528, 0.0528, 0.0528]
+[TIMING] epoch=223 train data_wait_sec=33.4 compute_sec=611.3 batches=1800
+[TIMING] epoch=223 val:stage3 data_wait_sec=46.6 compute_sec=12.2 batches=162
+[TIMING] epoch=223 train_sec=646.4 val_sec=60.5
+[10:40:01] epoch=223 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1595 val:stage3=0.1548 layers=[0.0532, 0.0532, 0.0532]
+[TIMING] epoch=224 train data_wait_sec=33.6 compute_sec=609.1 batches=1800
+[TIMING] epoch=224 val:stage3 data_wait_sec=46.4 compute_sec=12.1 batches=162
+[TIMING] epoch=224 train_sec=644.3 val_sec=60.1
+[10:51:45] epoch=224 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1592 val:stage3=0.1548 layers=[0.0531, 0.053, 0.0531]
+[TIMING] epoch=225 train data_wait_sec=34.2 compute_sec=605.3 batches=1800
+[TIMING] epoch=225 val:stage3 data_wait_sec=45.8 compute_sec=12.2 batches=162
+[TIMING] epoch=225 train_sec=641.2 val_sec=59.6
+[11:03:26] epoch=225 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1581 val:stage3=0.1549 layers=[0.0527, 0.0527, 0.0527]
+[TIMING] epoch=226 train data_wait_sec=33.9 compute_sec=608.8 batches=1800
+[TIMING] epoch=226 val:stage3 data_wait_sec=47.2 compute_sec=12.2 batches=162
+[TIMING] epoch=226 train_sec=644.4 val_sec=61.1
+[11:15:12] epoch=226 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1581 val:stage3=0.1548 layers=[0.0527, 0.0527, 0.0527]
+[TIMING] epoch=227 train data_wait_sec=33.8 compute_sec=612.1 batches=1800
+[TIMING] epoch=227 val:stage3 data_wait_sec=45.7 compute_sec=12.2 batches=162
+[TIMING] epoch=227 train_sec=647.6 val_sec=59.5
+[11:26:59] epoch=227 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1588 val:stage3=0.1548 layers=[0.0529, 0.0529, 0.053]
+[TIMING] epoch=228 train data_wait_sec=34.3 compute_sec=607.3 batches=1800
+[TIMING] epoch=228 val:stage3 data_wait_sec=47.2 compute_sec=12.2 batches=162
+[TIMING] epoch=228 train_sec=643.2 val_sec=61.1
+[11:38:44] epoch=228 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1580 val:stage3=0.1548 layers=[0.0527, 0.0526, 0.0527]
+[TIMING] epoch=229 train data_wait_sec=33.5 compute_sec=604.2 batches=1800
+[TIMING] epoch=229 val:stage3 data_wait_sec=46.0 compute_sec=12.3 batches=162
+[TIMING] epoch=229 train_sec=639.3 val_sec=59.9
+[11:50:23] epoch=229 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1588 val:stage3=0.1548 layers=[0.0529, 0.0529, 0.0529]
+[TIMING] epoch=230 train data_wait_sec=33.9 compute_sec=609.3 batches=1800
+[TIMING] epoch=230 val:stage3 data_wait_sec=48.7 compute_sec=12.1 batches=162
+[TIMING] epoch=230 train_sec=644.8 val_sec=62.4
+[12:02:10] epoch=230 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1586 val:stage3=0.1547 layers=[0.0529, 0.0529, 0.0529]
+[TIMING] epoch=231 train data_wait_sec=34.0 compute_sec=603.3 batches=1800
+[TIMING] epoch=231 val:stage3 data_wait_sec=45.9 compute_sec=12.3 batches=162
+[TIMING] epoch=231 train_sec=638.9 val_sec=59.8
+[12:13:50] epoch=231 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1590 val:stage3=0.1547 layers=[0.053, 0.053, 0.053]
+[TIMING] epoch=232 train data_wait_sec=33.6 compute_sec=606.4 batches=1800
+[TIMING] epoch=232 val:stage3 data_wait_sec=46.8 compute_sec=12.1 batches=162
+[TIMING] epoch=232 train_sec=641.7 val_sec=60.5
+[12:25:32] epoch=232 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1588 val:stage3=0.1549 layers=[0.053, 0.0529, 0.053]
+[TIMING] epoch=233 train data_wait_sec=34.3 compute_sec=607.6 batches=1800
+[TIMING] epoch=233 val:stage3 data_wait_sec=46.5 compute_sec=12.2 batches=162
+[TIMING] epoch=233 train_sec=643.6 val_sec=60.3
+[12:37:16] epoch=233 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1588 val:stage3=0.1549 layers=[0.0529, 0.0529, 0.0529]
+[TIMING] epoch=234 train data_wait_sec=33.5 compute_sec=606.2 batches=1800
+[TIMING] epoch=234 val:stage3 data_wait_sec=46.8 compute_sec=12.1 batches=162
+[TIMING] epoch=234 train_sec=641.3 val_sec=60.7
+[12:48:58] epoch=234 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1596 val:stage3=0.1548 layers=[0.0532, 0.0532, 0.0532]
+[TIMING] epoch=235 train data_wait_sec=33.4 compute_sec=607.3 batches=1800
+[TIMING] epoch=235 val:stage3 data_wait_sec=46.6 compute_sec=12.2 batches=162
+[TIMING] epoch=235 train_sec=642.3 val_sec=60.5
+[13:00:41] epoch=235 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1588 val:stage3=0.1548 layers=[0.053, 0.0529, 0.053]
+[TIMING] epoch=236 train data_wait_sec=32.9 compute_sec=609.1 batches=1800
+[TIMING] epoch=236 val:stage3 data_wait_sec=45.2 compute_sec=12.3 batches=162
+[TIMING] epoch=236 train_sec=643.7 val_sec=59.1
+[13:12:24] epoch=236 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1585 val:stage3=0.1548 layers=[0.0528, 0.0528, 0.0528]
+[TIMING] epoch=237 train data_wait_sec=33.9 compute_sec=607.5 batches=1800
+[TIMING] epoch=237 val:stage3 data_wait_sec=47.6 compute_sec=12.3 batches=162
+[TIMING] epoch=237 train_sec=643.0 val_sec=61.5
+[13:24:09] epoch=237 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1588 val:stage3=0.1548 layers=[0.0529, 0.0529, 0.053]
+[TIMING] epoch=238 train data_wait_sec=33.6 compute_sec=610.7 batches=1800
+[TIMING] epoch=238 val:stage3 data_wait_sec=45.6 compute_sec=12.1 batches=162
+[TIMING] epoch=238 train_sec=646.0 val_sec=59.4
+[13:35:54] epoch=238 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1584 val:stage3=0.1548 layers=[0.0528, 0.0528, 0.0528]
+[TIMING] epoch=239 train data_wait_sec=34.2 compute_sec=610.3 batches=1800
+[TIMING] epoch=239 val:stage3 data_wait_sec=47.7 compute_sec=12.1 batches=162
+[TIMING] epoch=239 train_sec=646.1 val_sec=61.5
+[13:47:42] epoch=239 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1591 val:stage3=0.1546 layers=[0.053, 0.053, 0.0531]
+[TIMING] epoch=240 train data_wait_sec=33.7 compute_sec=608.2 batches=1800
+[TIMING] epoch=240 val:stage3 data_wait_sec=45.2 compute_sec=12.3 batches=162
+[TIMING] epoch=240 train_sec=643.7 val_sec=59.1
+[13:59:25] epoch=240 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1585 val:stage3=0.1548 layers=[0.0528, 0.0528, 0.0529]
+[TIMING] epoch=241 train data_wait_sec=33.4 compute_sec=601.9 batches=1800
+[TIMING] epoch=241 val:stage3 data_wait_sec=47.2 compute_sec=12.3 batches=162
+[TIMING] epoch=241 train_sec=637.0 val_sec=61.2
+[14:11:03] epoch=241 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1595 val:stage3=0.1548 layers=[0.0532, 0.0531, 0.0532]
+[TIMING] epoch=242 train data_wait_sec=35.8 compute_sec=614.9 batches=1800
+[TIMING] epoch=242 val:stage3 data_wait_sec=45.4 compute_sec=12.3 batches=162
+[TIMING] epoch=242 train_sec=652.3 val_sec=59.4
+[14:22:55] epoch=242 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1577 val:stage3=0.1547 layers=[0.0526, 0.0526, 0.0526]
+[TIMING] epoch=243 train data_wait_sec=33.4 compute_sec=611.0 batches=1800
+[TIMING] epoch=243 val:stage3 data_wait_sec=47.9 compute_sec=12.3 batches=162
+[TIMING] epoch=243 train_sec=646.0 val_sec=61.8
+[14:34:43] epoch=243 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1588 val:stage3=0.1547 layers=[0.0529, 0.0529, 0.0529]
+[TIMING] epoch=244 train data_wait_sec=34.0 compute_sec=613.0 batches=1800
+[TIMING] epoch=244 val:stage3 data_wait_sec=45.7 compute_sec=12.2 batches=162
+[TIMING] epoch=244 train_sec=648.6 val_sec=59.5
+[14:46:32] epoch=244 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1586 val:stage3=0.1546 layers=[0.0529, 0.0528, 0.0529]
+[TIMING] epoch=245 train data_wait_sec=33.8 compute_sec=605.1 batches=1800
+[TIMING] epoch=245 val:stage3 data_wait_sec=47.4 compute_sec=12.3 batches=162
+[TIMING] epoch=245 train_sec=640.5 val_sec=61.4
+[14:58:14] epoch=245 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1587 val:stage3=0.1547 layers=[0.0529, 0.0529, 0.0529]
+[TIMING] epoch=246 train data_wait_sec=36.0 compute_sec=609.8 batches=1800
+[TIMING] epoch=246 val:stage3 data_wait_sec=46.2 compute_sec=12.1 batches=162
+[TIMING] epoch=246 train_sec=647.5 val_sec=60.0
+[15:10:01] epoch=246 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1592 val:stage3=0.1546 layers=[0.0531, 0.053, 0.0531]
+[TIMING] epoch=247 train data_wait_sec=33.2 compute_sec=604.7 batches=1800
+[TIMING] epoch=247 val:stage3 data_wait_sec=47.2 compute_sec=12.3 batches=162
+[TIMING] epoch=247 train_sec=639.5 val_sec=61.2
+[15:21:42] epoch=247 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1584 val:stage3=0.1547 layers=[0.0528, 0.0528, 0.0528]
+[TIMING] epoch=248 train data_wait_sec=35.8 compute_sec=602.9 batches=1800
+[TIMING] epoch=248 val:stage3 data_wait_sec=46.3 compute_sec=12.3 batches=162
+[TIMING] epoch=248 train_sec=640.3 val_sec=60.2
+[15:33:23] epoch=248 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1583 val:stage3=0.1546 layers=[0.0528, 0.0528, 0.0528]
+[TIMING] epoch=249 train data_wait_sec=33.4 compute_sec=609.5 batches=1800
+[TIMING] epoch=249 val:stage3 data_wait_sec=46.4 compute_sec=12.3 batches=162
+[TIMING] epoch=249 train_sec=644.6 val_sec=60.4
+[15:45:08] epoch=249 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1594 val:stage3=0.1546 layers=[0.0531, 0.0531, 0.0531]
+[TIMING] epoch=250 train data_wait_sec=34.3 compute_sec=605.1 batches=1800
+[TIMING] epoch=250 val:stage3 data_wait_sec=46.7 compute_sec=12.1 batches=162
+[TIMING] epoch=250 train_sec=641.1 val_sec=60.5
+[15:56:50] epoch=250 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1587 val:stage3=0.1547 layers=[0.0529, 0.0529, 0.0529]
+[TIMING] epoch=251 train data_wait_sec=34.0 compute_sec=598.2 batches=1800
+[TIMING] epoch=251 val:stage3 data_wait_sec=45.7 compute_sec=12.2 batches=162
+[TIMING] epoch=251 train_sec=633.9 val_sec=59.6
+[16:08:23] epoch=251 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1585 val:stage3=0.1546 layers=[0.0529, 0.0528, 0.0529]
+[TIMING] epoch=252 train data_wait_sec=33.7 compute_sec=603.5 batches=1800
+[TIMING] epoch=252 val:stage3 data_wait_sec=47.5 compute_sec=12.2 batches=162
+[TIMING] epoch=252 train_sec=638.9 val_sec=61.3
+[16:20:04] epoch=252 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1591 val:stage3=0.1547 layers=[0.053, 0.053, 0.053]
+[TIMING] epoch=253 train data_wait_sec=35.7 compute_sec=599.2 batches=1800
+[TIMING] epoch=253 val:stage3 data_wait_sec=46.3 compute_sec=12.2 batches=162
+[TIMING] epoch=253 train_sec=636.5 val_sec=60.2
+[16:31:41] epoch=253 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1585 val:stage3=0.1546 layers=[0.0528, 0.0528, 0.0529]
+[TIMING] epoch=254 train data_wait_sec=33.7 compute_sec=603.0 batches=1800
+[TIMING] epoch=254 val:stage3 data_wait_sec=45.6 compute_sec=12.1 batches=162
+[TIMING] epoch=254 train_sec=638.4 val_sec=59.4
+[16:43:18] epoch=254 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1587 val:stage3=0.1547 layers=[0.0529, 0.0529, 0.0529]
+[TIMING] epoch=255 train data_wait_sec=33.9 compute_sec=602.6 batches=1800
+[TIMING] epoch=255 val:stage3 data_wait_sec=47.7 compute_sec=12.1 batches=162
+[TIMING] epoch=255 train_sec=638.1 val_sec=61.5
+[16:54:58] epoch=255 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1592 val:stage3=0.1547 layers=[0.0531, 0.053, 0.0531]
+[TIMING] epoch=256 train data_wait_sec=34.0 compute_sec=600.7 batches=1800
+[TIMING] epoch=256 val:stage3 data_wait_sec=45.7 compute_sec=12.2 batches=162
+[TIMING] epoch=256 train_sec=636.4 val_sec=59.6
+[17:06:34] epoch=256 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1591 val:stage3=0.1546 layers=[0.0531, 0.053, 0.0531]
+[TIMING] epoch=257 train data_wait_sec=33.7 compute_sec=602.9 batches=1800
+[TIMING] epoch=257 val:stage3 data_wait_sec=46.3 compute_sec=12.1 batches=162
+[TIMING] epoch=257 train_sec=638.2 val_sec=60.0
+[17:18:13] epoch=257 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1591 val:stage3=0.1546 layers=[0.0531, 0.053, 0.0531]
+[TIMING] epoch=258 train data_wait_sec=33.6 compute_sec=601.4 batches=1800
+[TIMING] epoch=258 val:stage3 data_wait_sec=47.5 compute_sec=12.2 batches=162
+[TIMING] epoch=258 train_sec=636.7 val_sec=61.3
+[17:29:51] epoch=258 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1585 val:stage3=0.1547 layers=[0.0528, 0.0528, 0.0528]
+[TIMING] epoch=259 train data_wait_sec=34.0 compute_sec=604.3 batches=1800
+[TIMING] epoch=259 val:stage3 data_wait_sec=45.8 compute_sec=12.0 batches=162
+[TIMING] epoch=259 train_sec=639.9 val_sec=59.5
+[17:41:30] epoch=259 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1588 val:stage3=0.1545 layers=[0.0529, 0.0529, 0.0529]
+[TIMING] epoch=260 train data_wait_sec=33.6 compute_sec=607.2 batches=1800
+[TIMING] epoch=260 val:stage3 data_wait_sec=47.9 compute_sec=12.2 batches=162
+[TIMING] epoch=260 train_sec=642.5 val_sec=61.7
+[17:53:15] epoch=260 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1587 val:stage3=0.1546 layers=[0.0529, 0.0529, 0.0529]
+[TIMING] epoch=261 train data_wait_sec=33.9 compute_sec=605.8 batches=1800
+[TIMING] epoch=261 val:stage3 data_wait_sec=45.4 compute_sec=12.1 batches=162
+[TIMING] epoch=261 train_sec=641.3 val_sec=59.2
+[18:04:56] epoch=261 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1588 val:stage3=0.1546 layers=[0.053, 0.0529, 0.053]
+[TIMING] epoch=262 train data_wait_sec=33.2 compute_sec=602.7 batches=1800
+[TIMING] epoch=262 val:stage3 data_wait_sec=46.3 compute_sec=12.2 batches=162
+[TIMING] epoch=262 train_sec=637.5 val_sec=60.2
+[18:16:34] epoch=262 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1593 val:stage3=0.1547 layers=[0.0531, 0.0531, 0.0531]
+[TIMING] epoch=263 train data_wait_sec=34.1 compute_sec=602.7 batches=1800
+[TIMING] epoch=263 val:stage3 data_wait_sec=47.1 compute_sec=12.1 batches=162
+[TIMING] epoch=263 train_sec=638.4 val_sec=60.8
+[18:28:13] epoch=263 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1592 val:stage3=0.1546 layers=[0.0531, 0.053, 0.0531]
+[TIMING] epoch=264 train data_wait_sec=33.7 compute_sec=603.1 batches=1800
+[TIMING] epoch=264 val:stage3 data_wait_sec=46.1 compute_sec=12.0 batches=162
+[TIMING] epoch=264 train_sec=638.5 val_sec=59.8
+[18:39:51] epoch=264 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1586 val:stage3=0.1546 layers=[0.0529, 0.0528, 0.0529]
+[TIMING] epoch=265 train data_wait_sec=33.4 compute_sec=602.5 batches=1800
+[TIMING] epoch=265 val:stage3 data_wait_sec=46.7 compute_sec=12.3 batches=162
+[TIMING] epoch=265 train_sec=637.6 val_sec=60.7
+[18:51:30] epoch=265 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1597 val:stage3=0.1546 layers=[0.0532, 0.0532, 0.0532]
+[TIMING] epoch=266 train data_wait_sec=35.0 compute_sec=601.4 batches=1800
+[TIMING] epoch=266 val:stage3 data_wait_sec=46.6 compute_sec=12.2 batches=162
+[TIMING] epoch=266 train_sec=637.9 val_sec=60.5
+[19:03:08] epoch=266 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1589 val:stage3=0.1547 layers=[0.053, 0.053, 0.053]
+[TIMING] epoch=267 train data_wait_sec=34.1 compute_sec=602.9 batches=1800
+[TIMING] epoch=267 val:stage3 data_wait_sec=45.5 compute_sec=12.1 batches=162
+[TIMING] epoch=267 train_sec=638.7 val_sec=59.3
+[19:14:46] epoch=267 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1592 val:stage3=0.1546 layers=[0.0531, 0.053, 0.0531]
+[TIMING] epoch=268 train data_wait_sec=33.5 compute_sec=603.8 batches=1800
+[TIMING] epoch=268 val:stage3 data_wait_sec=47.7 compute_sec=12.0 batches=162
+[TIMING] epoch=268 train_sec=638.9 val_sec=61.3
+[19:26:27] epoch=268 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1589 val:stage3=0.1546 layers=[0.053, 0.0529, 0.053]
+[TIMING] epoch=269 train data_wait_sec=33.3 compute_sec=599.7 batches=1800
+[TIMING] epoch=269 val:stage3 data_wait_sec=46.3 compute_sec=12.3 batches=162
+[TIMING] epoch=269 train_sec=634.7 val_sec=60.2
+[19:38:02] epoch=269 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1586 val:stage3=0.1546 layers=[0.0529, 0.0529, 0.0529]
+[TIMING] epoch=270 train data_wait_sec=33.4 compute_sec=601.8 batches=1800
+[TIMING] epoch=270 val:stage3 data_wait_sec=45.2 compute_sec=12.3 batches=162
+[TIMING] epoch=270 train_sec=636.8 val_sec=59.1
+[19:49:38] epoch=270 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1589 val:stage3=0.1546 layers=[0.053, 0.0529, 0.053]
+[TIMING] epoch=271 train data_wait_sec=33.9 compute_sec=606.6 batches=1800
+[TIMING] epoch=271 val:stage3 data_wait_sec=47.7 compute_sec=12.1 batches=162
+[TIMING] epoch=271 train_sec=642.1 val_sec=61.4
+[20:01:22] epoch=271 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1580 val:stage3=0.1546 layers=[0.0527, 0.0526, 0.0527]
+[TIMING] epoch=272 train data_wait_sec=33.7 compute_sec=605.4 batches=1800
+[TIMING] epoch=272 val:stage3 data_wait_sec=45.6 compute_sec=12.1 batches=162
+[TIMING] epoch=272 train_sec=640.7 val_sec=59.4
+[20:13:02] epoch=272 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1587 val:stage3=0.1546 layers=[0.0529, 0.0529, 0.0529]
+[TIMING] epoch=273 train data_wait_sec=34.2 compute_sec=606.1 batches=1800
+[TIMING] epoch=273 val:stage3 data_wait_sec=47.3 compute_sec=12.2 batches=162
+[TIMING] epoch=273 train_sec=641.9 val_sec=61.2
+[20:24:45] epoch=273 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1587 val:stage3=0.1546 layers=[0.0529, 0.0529, 0.0529]
+[TIMING] epoch=274 train data_wait_sec=35.8 compute_sec=597.2 batches=1800
+[TIMING] epoch=274 val:stage3 data_wait_sec=46.0 compute_sec=12.4 batches=162
+[TIMING] epoch=274 train_sec=634.6 val_sec=60.1
+[20:36:20] epoch=274 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1587 val:stage3=0.1546 layers=[0.0529, 0.0529, 0.0529]
+[TIMING] epoch=275 train data_wait_sec=33.5 compute_sec=604.4 batches=1800
+[TIMING] epoch=275 val:stage3 data_wait_sec=45.5 compute_sec=12.2 batches=162
+[TIMING] epoch=275 train_sec=639.5 val_sec=59.4
+[20:47:59] epoch=275 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1587 val:stage3=0.1546 layers=[0.0529, 0.0529, 0.0529]
+[TIMING] epoch=276 train data_wait_sec=33.8 compute_sec=602.3 batches=1800
+[TIMING] epoch=276 val:stage3 data_wait_sec=47.9 compute_sec=12.1 batches=162
+[TIMING] epoch=276 train_sec=637.7 val_sec=61.7
+[20:59:38] epoch=276 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1588 val:stage3=0.1545 layers=[0.0529, 0.0529, 0.0529]
+[TIMING] epoch=277 train data_wait_sec=33.5 compute_sec=604.6 batches=1800
+[TIMING] epoch=277 val:stage3 data_wait_sec=45.9 compute_sec=12.2 batches=162
+[TIMING] epoch=277 train_sec=639.7 val_sec=59.7
+[21:11:18] epoch=277 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1585 val:stage3=0.1546 layers=[0.0528, 0.0528, 0.0528]
+[TIMING] epoch=278 train data_wait_sec=34.0 compute_sec=599.8 batches=1800
+[TIMING] epoch=278 val:stage3 data_wait_sec=46.2 compute_sec=12.2 batches=162
+[TIMING] epoch=278 train_sec=635.4 val_sec=60.0
+[21:22:54] epoch=278 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1594 val:stage3=0.1546 layers=[0.0531, 0.0531, 0.0531]
+[TIMING] epoch=279 train data_wait_sec=33.5 compute_sec=598.4 batches=1800
+[TIMING] epoch=279 val:stage3 data_wait_sec=47.7 compute_sec=12.2 batches=162
+[TIMING] epoch=279 train_sec=633.5 val_sec=61.6
+[21:34:29] epoch=279 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1588 val:stage3=0.1546 layers=[0.0529, 0.0529, 0.0529]
+[TIMING] epoch=280 train data_wait_sec=33.5 compute_sec=595.1 batches=1800
+[TIMING] epoch=280 val:stage3 data_wait_sec=46.7 compute_sec=12.1 batches=162
+[TIMING] epoch=280 train_sec=630.2 val_sec=60.5
+[21:46:00] epoch=280 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1589 val:stage3=0.1546 layers=[0.053, 0.0529, 0.053]
+[TIMING] epoch=281 train data_wait_sec=33.8 compute_sec=609.1 batches=1800
+[TIMING] epoch=281 val:stage3 data_wait_sec=46.6 compute_sec=12.2 batches=162
+[TIMING] epoch=281 train_sec=644.6 val_sec=60.5
+[21:57:45] epoch=281 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1580 val:stage3=0.1546 layers=[0.0527, 0.0527, 0.0527]
+[TIMING] epoch=282 train data_wait_sec=33.9 compute_sec=601.8 batches=1800
+[TIMING] epoch=282 val:stage3 data_wait_sec=47.2 compute_sec=12.2 batches=162
+[TIMING] epoch=282 train_sec=637.4 val_sec=61.0
+[22:09:24] epoch=282 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1585 val:stage3=0.1546 layers=[0.0528, 0.0528, 0.0529]
+[TIMING] epoch=283 train data_wait_sec=33.8 compute_sec=604.1 batches=1800
+[TIMING] epoch=283 val:stage3 data_wait_sec=45.6 compute_sec=12.1 batches=162
+[TIMING] epoch=283 train_sec=639.6 val_sec=59.4
+[22:21:03] epoch=283 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1590 val:stage3=0.1546 layers=[0.053, 0.053, 0.053]
+[TIMING] epoch=284 train data_wait_sec=33.9 compute_sec=603.9 batches=1800
+[TIMING] epoch=284 val:stage3 data_wait_sec=47.3 compute_sec=12.3 batches=162
+[TIMING] epoch=284 train_sec=639.5 val_sec=61.1
+[22:32:43] epoch=284 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1585 val:stage3=0.1546 layers=[0.0528, 0.0528, 0.0529]
+[TIMING] epoch=285 train data_wait_sec=36.1 compute_sec=603.1 batches=1800
+[TIMING] epoch=285 val:stage3 data_wait_sec=45.9 compute_sec=12.0 batches=162
+[TIMING] epoch=285 train_sec=640.9 val_sec=59.5
+[22:44:24] epoch=285 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1583 val:stage3=0.1546 layers=[0.0528, 0.0527, 0.0528]
+[TIMING] epoch=286 train data_wait_sec=34.1 compute_sec=600.3 batches=1800
+[TIMING] epoch=286 val:stage3 data_wait_sec=46.0 compute_sec=12.3 batches=162
+[TIMING] epoch=286 train_sec=636.0 val_sec=60.0
+[22:56:00] epoch=286 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1587 val:stage3=0.1546 layers=[0.0529, 0.0529, 0.0529]
+[TIMING] epoch=287 train data_wait_sec=34.3 compute_sec=606.1 batches=1800
+[TIMING] epoch=287 val:stage3 data_wait_sec=47.5 compute_sec=12.2 batches=162
+[TIMING] epoch=287 train_sec=641.9 val_sec=61.3
+[23:07:43] epoch=287 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1584 val:stage3=0.1546 layers=[0.0528, 0.0528, 0.0528]
+[TIMING] epoch=288 train data_wait_sec=33.3 compute_sec=598.6 batches=1800
+[TIMING] epoch=288 val:stage3 data_wait_sec=45.7 compute_sec=12.2 batches=162
+[TIMING] epoch=288 train_sec=633.6 val_sec=59.6
+[23:19:17] epoch=288 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1595 val:stage3=0.1546 layers=[0.0532, 0.0531, 0.0532]
+[TIMING] epoch=289 train data_wait_sec=33.9 compute_sec=603.9 batches=1800
+[TIMING] epoch=289 val:stage3 data_wait_sec=46.6 compute_sec=12.2 batches=162
+[TIMING] epoch=289 train_sec=639.4 val_sec=60.4
+[23:30:57] epoch=289 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1587 val:stage3=0.1546 layers=[0.0529, 0.0529, 0.0529]
+[TIMING] epoch=290 train data_wait_sec=33.4 compute_sec=597.4 batches=1800
+[TIMING] epoch=290 val:stage3 data_wait_sec=47.5 compute_sec=12.3 batches=162
+[TIMING] epoch=290 train_sec=632.4 val_sec=61.4
+[23:42:31] epoch=290 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1586 val:stage3=0.1546 layers=[0.0529, 0.0529, 0.0529]
+[TIMING] epoch=291 train data_wait_sec=33.7 compute_sec=600.3 batches=1800
+[TIMING] epoch=291 val:stage3 data_wait_sec=46.1 compute_sec=12.1 batches=162
+[TIMING] epoch=291 train_sec=635.7 val_sec=59.8
+[23:54:06] epoch=291 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1589 val:stage3=0.1546 layers=[0.053, 0.0529, 0.053]
+[TIMING] epoch=292 train data_wait_sec=33.3 compute_sec=597.7 batches=1800
+[TIMING] epoch=292 val:stage3 data_wait_sec=45.9 compute_sec=12.2 batches=162
+[TIMING] epoch=292 train_sec=632.7 val_sec=59.8
+[00:05:39] epoch=292 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1586 val:stage3=0.1546 layers=[0.0529, 0.0528, 0.0529]
+[TIMING] epoch=293 train data_wait_sec=33.7 compute_sec=601.3 batches=1800
+[TIMING] epoch=293 val:stage3 data_wait_sec=47.4 compute_sec=12.3 batches=162
+[TIMING] epoch=293 train_sec=636.8 val_sec=61.4
+[00:17:17] epoch=293 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1587 val:stage3=0.1545 layers=[0.0529, 0.0529, 0.0529]
+[TIMING] epoch=294 train data_wait_sec=34.1 compute_sec=603.0 batches=1800
+[TIMING] epoch=294 val:stage3 data_wait_sec=45.4 compute_sec=12.0 batches=162
+[TIMING] epoch=294 train_sec=638.8 val_sec=59.1
+[00:28:55] epoch=294 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1589 val:stage3=0.1546 layers=[0.053, 0.0529, 0.053]
+[TIMING] epoch=295 train data_wait_sec=33.9 compute_sec=600.6 batches=1800
+[TIMING] epoch=295 val:stage3 data_wait_sec=45.8 compute_sec=12.2 batches=162
+[TIMING] epoch=295 train_sec=636.0 val_sec=59.6
+[00:40:31] epoch=295 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1582 val:stage3=0.1545 layers=[0.0527, 0.0527, 0.0528]
+[TIMING] epoch=296 train data_wait_sec=33.9 compute_sec=602.8 batches=1800
+[TIMING] epoch=296 val:stage3 data_wait_sec=47.3 compute_sec=12.1 batches=162
+[TIMING] epoch=296 train_sec=638.4 val_sec=61.1
+[00:52:11] epoch=296 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1586 val:stage3=0.1546 layers=[0.0529, 0.0528, 0.0529]
+[TIMING] epoch=297 train data_wait_sec=33.0 compute_sec=597.3 batches=1800
+[TIMING] epoch=297 val:stage3 data_wait_sec=45.8 compute_sec=12.2 batches=162
+[TIMING] epoch=297 train_sec=632.0 val_sec=59.6
+[01:03:43] epoch=297 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1583 val:stage3=0.1546 layers=[0.0528, 0.0528, 0.0528]
+[TIMING] epoch=298 train data_wait_sec=33.8 compute_sec=598.1 batches=1800
+[TIMING] epoch=298 val:stage3 data_wait_sec=45.9 compute_sec=12.2 batches=162
+[TIMING] epoch=298 train_sec=633.7 val_sec=59.9
+[01:15:16] epoch=298 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1592 val:stage3=0.1546 layers=[0.0531, 0.0531, 0.0531]
+[TIMING] epoch=299 train data_wait_sec=34.0 compute_sec=603.5 batches=1800
+[TIMING] epoch=299 val:stage3 data_wait_sec=47.7 compute_sec=12.1 batches=162
+[TIMING] epoch=299 train_sec=639.2 val_sec=61.5
+[01:26:57] epoch=299 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1587 val:stage3=0.1546 layers=[0.0529, 0.0529, 0.0529]
+[TIMING] epoch=300 train data_wait_sec=33.7 compute_sec=607.3 batches=1800
+[TIMING] epoch=300 val:stage3 data_wait_sec=45.8 compute_sec=12.2 batches=162
+[TIMING] epoch=300 train_sec=642.6 val_sec=59.7
+[01:38:40] epoch=300 stage=3 gamma=[5.0, 5.0, 5.0] train=0.1586 val:stage3=0.1546 layers=[0.0529, 0.0528, 0.0529]
+=== attempt=1 exited rc=0 at 2026-07-19T01:38:41+09:00 ===
+training completed successfully.
+end_time=2026-07-19T01:38:41+09:00

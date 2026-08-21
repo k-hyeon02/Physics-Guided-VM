@@ -1,0 +1,81 @@
+job_id=8144
+job_name=agg_rl_FM
+hostname=node02
+start_time=2026-07-08T23:24:12+09:00
+cuda_visible_devices=0
+slurm_cpus_per_task=24
+slurm_mem_per_node=49152
+Wed Jul  8 23:24:12 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 570.124.06             Driver Version: 570.124.06     CUDA Version: 12.8     |
+|-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA GeForce RTX 3090        On  |   00000000:17:00.0 Off |                  N/A |
+| 49%   44C    P8             28W /  345W |       2MiB /  24576MiB |      0%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+                                                                                         
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+launch_command=bash scripts/train_model.sh 
+auto_resume_from=/home/s2021102349/Audio-Geometry-Grid_Representation-Learning/checkpoints/agg_rl_FM_paper/latest.pt
+repo_root=/home/s2021102349/Audio-Geometry-Grid_Representation-Learning
+run_name=agg_rl_FM_paper
+save_dir=/home/s2021102349/Audio-Geometry-Grid_Representation-Learning/checkpoints/agg_rl_FM_paper
+log_file=/home/s2021102349/Audio-Geometry-Grid_Representation-Learning/data/train_runs/agg_rl_FM_paper/train.log
+mpe_type=FM
+start_time=2026-07-08T23:24:14+09:00
+command=python train.py --librispeech_train /home/s2021102349/Audio-Geometry-Grid_Representation-Learning/datasets/librispeech/LibriSpeech/train-clean-100 --librispeech_val /home/s2021102349/Audio-Geometry-Grid_Representation-Learning/datasets/librispeech/LibriSpeech/test-clean --ms_snsd_train /home/s2021102349/Audio-Geometry-Grid_Representation-Learning/datasets/ms-snsd/MS-SNSD/noise_train --ms_snsd_val /home/s2021102349/Audio-Geometry-Grid_Representation-Learning/datasets/ms-snsd/MS-SNSD/noise_test --mpe_type FM --save_dir /home/s2021102349/Audio-Geometry-Grid_Representation-Learning/checkpoints/agg_rl_FM_paper --batch_size 16 --num_workers 4 --prefetch_factor 1 --log_interval 0 --train_samples_per_epoch 28800 --fixed_suite_samples 2000 --dynamic_samples_per_channel 300 --seed 42 --resume /home/s2021102349/Audio-Geometry-Grid_Representation-Learning/checkpoints/agg_rl_FM_paper/latest.pt 
+device=cuda
+model=AGG_RL(FM) params=2,788,836
+train_speech=28539 train_noise=128
+/home/s2021102349/Audio-Geometry-Grid_Representation-Learning/trainer/train.py:213: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  checkpoint = torch.load(resume_path, map_location=device)
+[23:50:09] epoch=019 stage=2 gamma=[32.0, 12.0, 5.0] train=0.9176 val:stage2=0.9045 layers=[0.6778, 0.1905, 0.0492]
+[00:15:49] epoch=020 stage=2 gamma=[32.0, 12.0, 5.0] train=0.9158 val:stage2=0.9016 layers=[0.6766, 0.19, 0.0492]
+GPUassert: out of memory /tmp/pip-req-build-4n_fzkd2/src/gpuRIR_cuda.cu 627
+Traceback (most recent call last):
+  File "/home/s2021102349/.conda/envs/dlearn/lib/python3.11/site-packages/torch/utils/data/dataloader.py", line 1243, in _try_get_data
+    data = self._data_queue.get(timeout=timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/s2021102349/.conda/envs/dlearn/lib/python3.11/queue.py", line 180, in get
+    self.not_empty.wait(remaining)
+  File "/home/s2021102349/.conda/envs/dlearn/lib/python3.11/threading.py", line 331, in wait
+    gotit = waiter.acquire(True, timeout)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/s2021102349/.conda/envs/dlearn/lib/python3.11/site-packages/torch/utils/data/_utils/signal_handling.py", line 73, in handler
+    _error_if_any_worker_fails()
+RuntimeError: DataLoader worker (pid 1521671) exited unexpectedly with exit code 2. Details are lost due to multiprocessing. Rerunning with num_workers=0 may give better error trace.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/s2021102349/Audio-Geometry-Grid_Representation-Learning/train.py", line 91, in <module>
+    main()
+  File "/home/s2021102349/Audio-Geometry-Grid_Representation-Learning/train.py", line 69, in main
+    train(
+  File "/home/s2021102349/Audio-Geometry-Grid_Representation-Learning/trainer/train.py", line 263, in train
+    train_loss, train_layer_loss, _ = _run_loader(
+                                      ^^^^^^^^^^^^
+  File "/home/s2021102349/Audio-Geometry-Grid_Representation-Learning/trainer/train.py", line 95, in _run_loader
+    for batch in loader:
+  File "/home/s2021102349/.conda/envs/dlearn/lib/python3.11/site-packages/torch/utils/data/dataloader.py", line 701, in __next__
+    data = self._next_data()
+           ^^^^^^^^^^^^^^^^^
+  File "/home/s2021102349/.conda/envs/dlearn/lib/python3.11/site-packages/torch/utils/data/dataloader.py", line 1448, in _next_data
+    idx, data = self._get_data()
+                ^^^^^^^^^^^^^^^^
+  File "/home/s2021102349/.conda/envs/dlearn/lib/python3.11/site-packages/torch/utils/data/dataloader.py", line 1402, in _get_data
+    success, data = self._try_get_data()
+                    ^^^^^^^^^^^^^^^^^^^^
+  File "/home/s2021102349/.conda/envs/dlearn/lib/python3.11/site-packages/torch/utils/data/dataloader.py", line 1256, in _try_get_data
+    raise RuntimeError(
+RuntimeError: DataLoader worker (pid(s) 1521671) exited unexpectedly

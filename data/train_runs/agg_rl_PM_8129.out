@@ -1,0 +1,40 @@
+job_id=8129
+job_name=agg_rl_PM
+hostname=node03
+start_time=2026-07-08T19:02:10+09:00
+cuda_visible_devices=0
+slurm_cpus_per_task=16
+slurm_mem_per_node=49152
+Wed Jul  8 19:02:10 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 570.124.06             Driver Version: 570.124.06     CUDA Version: 12.8     |
+|-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA GeForce RTX 3090        On  |   00000000:17:00.0 Off |                  N/A |
+| 40%   30C    P8             22W /  345W |       2MiB /  24576MiB |      0%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+                                                                                         
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+launch_command=bash scripts/train_model.sh 
+repo_root=/home/s2021102349/Audio-Geometry-Grid_Representation-Learning
+run_name=agg_rl_PM_paper
+save_dir=/home/s2021102349/Audio-Geometry-Grid_Representation-Learning/checkpoints/agg_rl_PM_paper
+log_file=/home/s2021102349/Audio-Geometry-Grid_Representation-Learning/data/train_runs/agg_rl_PM_paper/train.log
+mpe_type=PM
+start_time=2026-07-08T19:02:12+09:00
+command=python train.py --librispeech_train /home/s2021102349/Audio-Geometry-Grid_Representation-Learning/datasets/librispeech/LibriSpeech/train-clean-100 --librispeech_val /home/s2021102349/Audio-Geometry-Grid_Representation-Learning/datasets/librispeech/LibriSpeech/test-clean --ms_snsd_train /home/s2021102349/Audio-Geometry-Grid_Representation-Learning/datasets/ms-snsd/MS-SNSD/noise_train --ms_snsd_val /home/s2021102349/Audio-Geometry-Grid_Representation-Learning/datasets/ms-snsd/MS-SNSD/noise_test --mpe_type PM --save_dir /home/s2021102349/Audio-Geometry-Grid_Representation-Learning/checkpoints/agg_rl_PM_paper --batch_size 16 --num_workers 4 --prefetch_factor 1 --log_interval 0 --train_samples_per_epoch 28800 --fixed_suite_samples 2000 --dynamic_samples_per_channel 300 --seed 42 
+device=cuda
+model=AGG_RL(PM) params=2,788,836
+train_speech=28539 train_noise=128
+[19:11:15] epoch=001 stage=1 gamma=[32.0, 12.0, 5.0] train=0.9800 val:stage1=0.9587 layers=[0.7214, 0.2058, 0.0528]
+[19:19:52] epoch=002 stage=1 gamma=[32.0, 12.0, 5.0] train=0.9550 val:stage1=0.9282 layers=[0.7039, 0.1998, 0.0513]

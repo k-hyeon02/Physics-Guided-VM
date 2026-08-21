@@ -1,0 +1,30 @@
+======================================================
+NUM_WORKERS=16  (FM, batch16, prefetch1, cpu conv)
+======================================================
+device=cuda  rir_convolution_device=cpu
+[TIMING] epoch=001 train data_wait_sec=52.2 compute_sec=32.7 batches=100
+[TIMING] epoch=001 val:stage3 data_wait_sec=42.0 compute_sec=1.4 batches=18
+[TIMING] epoch=001 train_sec=86.4 val_sec=44.8
+[15:04:18] epoch=001 stage=3 gamma=[32.0, 12.0, 5.0] train=1.3151 val:stage3=1.1146 layers=[0.915, 0.3084, 0.0917]
+[TIMING] epoch=002 train data_wait_sec=49.0 compute_sec=33.3 batches=100
+[TIMING] epoch=002 val:stage3 data_wait_sec=41.7 compute_sec=1.4 batches=18
+[TIMING] epoch=002 train_sec=83.8 val_sec=44.6
+[15:06:26] epoch=002 stage=3 gamma=[32.0, 12.0, 5.0] train=1.1187 val:stage3=1.1004 layers=[0.8002, 0.2526, 0.0658]
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 4:24.91
+GPU util: mean=27.3% <20%(idle)=71% >=90%=25%
+
+======================================================
+NUM_WORKERS=24  (FM, batch16, prefetch1, cpu conv)
+======================================================
+device=cuda  rir_convolution_device=cpu
+[TIMING] epoch=001 train data_wait_sec=58.7 compute_sec=33.0 batches=100
+[TIMING] epoch=001 val:stage3 data_wait_sec=53.1 compute_sec=1.4 batches=18
+[TIMING] epoch=001 train_sec=93.7 val_sec=56.2
+[15:09:01] epoch=001 stage=3 gamma=[32.0, 12.0, 5.0] train=1.2984 val:stage3=1.1049 layers=[0.9022, 0.3084, 0.0877]
+[TIMING] epoch=002 train data_wait_sec=60.0 compute_sec=33.7 batches=100
+[TIMING] epoch=002 val:stage3 data_wait_sec=52.8 compute_sec=1.4 batches=18
+[TIMING] epoch=002 train_sec=95.8 val_sec=55.9
+[15:11:33] epoch=002 stage=3 gamma=[32.0, 12.0, 5.0] train=1.1229 val:stage3=1.1082 layers=[0.8031, 0.2539, 0.0659]
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 5:06.35
+GPU util: mean=23.9% <20%(idle)=75% >=90%=23%
+ALL DONE

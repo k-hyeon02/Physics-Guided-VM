@@ -1,0 +1,9 @@
+/home/s2021102349/.conda/envs/dlearn/lib/python3.11/site-packages/webrtcvad.py:1: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+=== __getitem__ 단계별 평균 (n=60, conv=cpu) ===
+  load      :    13.9 ms/sample  ( 3.4%)
+  resample  :     0.0 ms/sample  ( 0.0%)
+  vad       :     1.7 ms/sample  ( 0.4%)
+  mic       :   325.3 ms/sample  (80.6%)
+  rir_sim   :    62.4 ms/sample  (15.5%)
+  total     :   403.4 ms/sample  (100.0%)

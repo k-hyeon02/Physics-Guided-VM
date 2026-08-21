@@ -1,0 +1,28 @@
+job_id=8190
+hostname=node02
+start_time=2026-07-13T11:14:52+09:00
+Mon Jul 13 11:14:52 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 570.124.06             Driver Version: 570.124.06     CUDA Version: 12.8     |
+|-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA GeForce RTX 3090        On  |   00000000:65:00.0 Off |                  N/A |
+| 40%   31C    P8             23W /  345W |       2MiB /  24576MiB |      0%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+                                                                                         
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+ckpt=checkpoints/agg_rl_FM_paper/best.pt mpe=FM batch=8 workers=8 spc=300
+=== eval attempt=1/20 at 2026-07-13T11:14:54+09:00 ===
+checkpoint=checkpoints/agg_rl_FM_paper/best.pt (epoch=280, mpe=FM)
+device=cuda
+

@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "/home/s2021102349/Audio-Geometry-Grid_Representation-Learning/scripts/diagnose_dynamic_gap.py", line 12, in <module>
+    from data.dataset import SyntheticDOADataset, build_dataloader
+ModuleNotFoundError: No module named 'data'

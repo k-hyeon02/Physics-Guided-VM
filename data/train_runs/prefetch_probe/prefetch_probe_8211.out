@@ -1,0 +1,11 @@
+======================================================
+PREFETCH_FACTOR=1  (FM, batch16, worker16, short bench)
+======================================================
+/home/s2021102349/.local/lib/python3.12/site-packages/torch/cuda/__init__.py:187: UserWarning: CUDA initialization: The NVIDIA driver on your system is too old (found version 12080). Please update your GPU driver by downloading and installing a new version from the URL: http://www.nvidia.com/Download/index.aspx Alternatively, go to: https://pytorch.org to install a PyTorch version that has been compiled with your version of the CUDA driver. (Triggered internally at /pytorch/c10/cuda/CUDAFunctions.cpp:119.)
+  return torch._C._cuda_getDeviceCount() > 0
+device=cpu
+model=AGG_RL(FM) params=2,788,836
+BENCH: stage3 (dynamic 4-12ch) from epoch 1
+/home/s2021102349/.local/lib/python3.12/site-packages/torch/utils/data/dataloader.py:1095: UserWarning: 'pin_memory' argument is set as true but no accelerator is found, then device pinned memory won't be used.
+  super().__init__(loader)
+slurmstepd: error: *** JOB 8211 ON node04 CANCELLED AT 2026-07-16T13:53:15 ***

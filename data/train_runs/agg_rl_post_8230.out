@@ -1,0 +1,23 @@
+job_id=8230 host=node01 start=2026-07-22T18:10:35+09:00
+run=agg_rl_PM_snrfix_20260720 mpe=PM tag=snrfix_20260720 ckpt=checkpoints/agg_rl_PM_snrfix_20260720/best.pt
+=== eval_to_table attempt=1/20 at 2026-07-22T18:10:37+09:00 ===
+running: /home/s2021102349/.conda/envs/dlearn/bin/python /home/s2021102349/Audio-Geometry-Grid_Representation-Learning/evaluate.py --checkpoint checkpoints/agg_rl_PM_snrfix_20260720/best.pt --mpe_type PM --librispeech_val datasets/librispeech/LibriSpeech/test-clean --ms_snsd_val datasets/ms-snsd/MS-SNSD/noise_test --nao_dir datasets/locata_eval/nao --eigenmike_dir datasets/locata_eval/eigenmike --batch_size 8 --num_workers 8 --samples_per_channel 300
+checkpoint=checkpoints/agg_rl_PM_snrfix_20260720/best.pt (epoch=295, mpe=PM)
+device=cuda
+
+dataset        MAE(deg)   ACC10(%)    #frames
+----------------------------------------------
+NAO robot          6.53      77.83          4
+Eigenmike          9.82      79.47          4
+Dynamic-S         13.92      71.85       2664
+Dynamic-U         10.40      80.23       1184
+----------------------------------------------
+mean_mae          10.17
+
+
+saved:
+  /home/s2021102349/Audio-Geometry-Grid_Representation-Learning/figures/eval_table_snrfix_20260720.csv
+  /home/s2021102349/Audio-Geometry-Grid_Representation-Learning/figures/eval_table_snrfix_20260720.md
+  /home/s2021102349/Audio-Geometry-Grid_Representation-Learning/figures/eval_bars_snrfix_20260720.png
+[agg_rl_PM_snrfix_20260720] no epoch records found (files=0) — skip
+end=2026-07-22T18:15:05+09:00

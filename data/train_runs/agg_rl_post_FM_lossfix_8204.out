@@ -1,0 +1,28 @@
+job_id=8204 host=node02 start=2026-07-17T14:35:25+09:00
+run=agg_rl_FM_lossfix_20260713 mpe=FM tag=FM_lossfix_20260713 ckpt=checkpoints/agg_rl_FM_lossfix_20260713/best.pt
+=== eval_to_table attempt=1/20 at 2026-07-17T14:35:27+09:00 ===
+running: /home/s2021102349/.conda/envs/dlearn/bin/python /home/s2021102349/Audio-Geometry-Grid_Representation-Learning/evaluate.py --checkpoint checkpoints/agg_rl_FM_lossfix_20260713/best.pt --mpe_type FM --librispeech_val datasets/librispeech/LibriSpeech/test-clean --ms_snsd_val datasets/ms-snsd/MS-SNSD/noise_test --nao_dir datasets/locata_eval/nao --eigenmike_dir datasets/locata_eval/eigenmike --batch_size 8 --num_workers 8 --samples_per_channel 300
+checkpoint=checkpoints/agg_rl_FM_lossfix_20260713/best.pt (epoch=290, mpe=FM)
+device=cuda
+
+dataset        MAE(deg)   ACC10(%)    #frames
+----------------------------------------------
+NAO robot         10.47      46.97          4
+Eigenmike         13.83      10.05          4
+Dynamic-S         49.55      16.08       2664
+Dynamic-U         45.36      19.35       1184
+----------------------------------------------
+mean_mae          29.80
+
+
+saved:
+  /home/s2021102349/Audio-Geometry-Grid_Representation-Learning/figures/eval_table_FM_lossfix_20260713.csv
+  /home/s2021102349/Audio-Geometry-Grid_Representation-Learning/figures/eval_table_FM_lossfix_20260713.md
+  /home/s2021102349/Audio-Geometry-Grid_Representation-Learning/figures/eval_bars_FM_lossfix_20260713.png
+
+===== agg_rl_FM_lossfix_20260713 =====
+  로그 1개, epoch 1..300 (300 pts)
+  최종 epoch300: train=0.1638 val=0.1596
+  BEST val=0.1595 @ epoch 290 (stage3)
+  -> /home/s2021102349/Audio-Geometry-Grid_Representation-Learning/figures/loss_curve_FM_lossfix_20260713.png
+end=2026-07-17T14:39:59+09:00

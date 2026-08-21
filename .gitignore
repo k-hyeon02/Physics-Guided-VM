@@ -1,2 +1,10 @@
+.claude
+.codex
+.agents
+
 *.pdf
 datasets
+__pycache__/
+*.py[cod]
+.pytest_cache/
+/tests

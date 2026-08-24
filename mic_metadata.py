@@ -18,7 +18,7 @@ def mic_position_metadata(
         (B, K, 6) 형태의 mic position metadata
     """
 
-    if microphone_coordinates.ndim == 2:
+    if microphone_coordinates.ndim == 2:  # Batch 차원 없으면 만듦
         microphone_coordinates = microphone_coordinates.unsqueeze(0)
 
     # 배열의 평행이동에는 불변이고 방향·크기 정보는 보존하도록 중심만 제거
@@ -30,4 +30,4 @@ def mic_position_metadata(
 
     position_i = relative_coordinates[:, pair_indices[:, 0]]
     position_j = relative_coordinates[:, pair_indices[:, 1]]
-    return torch.cat((position_i, position_j), dim=-1)
+    return torch.cat((position_i, position_j), dim=-1)  # (B, K, 6)

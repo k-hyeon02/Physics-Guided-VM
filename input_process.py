@@ -160,20 +160,20 @@ class GCCPHATProcess(nn.Module):
 
         # 상대 위치 벡터의 norm / 음속
         pair_max_delay_seconds = (
-            torch.linalg.vector_norm(pair_displacements, dim=-1)
-            / self.speed_of_sound
+            torch.linalg.vector_norm(pair_displacements, dim=-1) / self.speed_of_sound
         )  # (B, K)
 
         # 모든 마이크 쌍 중 가장 긴 거리를 기준으로 사용
         max_delay_seconds = pair_max_delay_seconds.amax(dim=-1)  # (B,)
         # 초 단위를 sample 단위로 변환
         max_delay_samples = max_delay_seconds * self.sample_rate  # (B,)
+        # 물리적 최대 지연이 GCC의 표현 가능 lag 범위 넘으면
         if torch.any(max_delay_samples >= self.fft_length / 2):
             raise ValueError(
                 "The physical maximum delay must be smaller than fft_length / 2 "
                 "samples to avoid circular-correlation aliasing."
             )
-
+        
         unit_grid = self.unit_delay_grid.to(
             device=microphone_coordinates.device,
             dtype=microphone_coordinates.dtype,
@@ -194,25 +194,20 @@ class GCCPHATProcess(nn.Module):
         """
 
         batch_size, num_pairs, num_frames, num_lags = centered_gcc.shape
-        min_lag = -(num_lags // 2)
-        positions = delay_samples - min_lag  # (B, G)
-        lower = positions.floor().to(torch.long).clamp(0, num_lags - 1)  # (B, G)
-        upper = (lower + 1).clamp(max=num_lags - 1)  # (B, G)
-        upper_weight = positions - lower.to(positions.dtype)  # (B, G)
+        min_lag = -(num_lags // 2)  # scalar
+        positions = delay_samples - min_lag  # (B, G)  # 원하는 지연의 index 값
+        lower = positions.floor().to(torch.long).clamp(0, num_lags - 1)  # position보다 크지 않은 정수 index
+        upper = (lower + 1).clamp(max=num_lags - 1)  # position보다 큰 정수 index
+        upper_weight = positions - lower.to(positions.dtype)  # interpolate 가중치 계산
 
-        gather_shape = (
-            batch_size,
-            num_pairs,
-            num_frames,
-            self.num_delay_bins,
-        )
-        lower_index = lower[:, None, None, :].expand(gather_shape)
+        gather_shape = (batch_size, num_pairs, num_frames,self.num_delay_bins) # (B, K', T, G)
+        lower_index = lower[:, None, None, :].expand(gather_shape)  # (B, K', T, G)
         upper_index = upper[:, None, None, :].expand(gather_shape)
+
+        # GCC 값 가져오기
         lower_value = torch.gather(centered_gcc, dim=-1, index=lower_index)
         upper_value = torch.gather(centered_gcc, dim=-1, index=upper_index)
-        return lower_value + upper_weight[:, None, None, :] * (
-            upper_value - lower_value
-        )
+        return lower_value + upper_weight[:, None, None, :] * (upper_value - lower_value)
 
     def _gcc_phat_features(
         self,
@@ -253,14 +248,10 @@ class GCCPHATProcess(nn.Module):
         input_audio: Tensor,
         microphone_coordinates: Tensor,
     ) -> tuple[Tensor, Tensor, Tensor]:
-        input_audio, microphone_coordinates = self._validate_and_batch_inputs(
-            input_audio,
-            microphone_coordinates,
-        )
-        pairs = microphone_pair_indices(
-            input_audio.shape[1],
-            input_audio.device,
-        )  # (K, 2)
+        
+        input_audio, microphone_coordinates = self._validate_and_batch_inputs(input_audio,
+                                                                              microphone_coordinates)
+        pairs = microphone_pair_indices(input_audio.shape[1], input_audio.device)  # (K, 2)
 
         # STFT: x_i -> X_i
         x_real, x_imag = self.STFT(input_audio, cplx=True)  # 각각 (B, M, F, T)
@@ -270,6 +261,8 @@ class GCCPHATProcess(nn.Module):
         delay_samples = self._physical_delay_grid(microphone_coordinates, pairs)
         gcc_phat = self._gcc_phat_features(spectrum, pairs, delay_samples)
         return gcc_phat, delay_samples, pairs
+
+
 
     # 보조 공개 API --------------------------------------------------------
     def cross_correlation(

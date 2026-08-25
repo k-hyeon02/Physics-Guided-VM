@@ -36,7 +36,7 @@ def physics_based_decoder(
     z: Tensor,
     pair_displacement: Tensor,
     delay_bins: Tensor,
-    speed_of_sound: Tensor,
+    speed_of_sound: float,
     sample_rate: float,
     sigma: float
 ) -> Tensor:

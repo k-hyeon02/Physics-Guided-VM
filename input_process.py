@@ -23,6 +23,30 @@ def microphone_pair_indices(
     ).transpose(0, 1)
 
 
+def pair_displacement(
+    microphone_coordinates: Tensor,
+    pair_indices: Tensor,
+) -> Tensor:
+    """마이크쌍의 상대 위치 벡터 v_i - v_j (Eq 3, 9에서 공용으로 쓰임)
+
+    Args:
+        microphone_coordinates: 미터 단위 (B, M, D) 또는 (M, D) 좌표
+        pair_indices: (K, 2) 마이크쌍 인덱스
+
+    Returns:
+        (B, K, D) -- centroid 이동에 불변 (차이이므로 상쇄됨)
+    """
+
+    if microphone_coordinates.ndim == 2:
+        microphone_coordinates = microphone_coordinates.unsqueeze(0)
+    pair_indices = pair_indices.to(device=microphone_coordinates.device)
+
+    return (
+        microphone_coordinates[:, pair_indices[:, 0]]
+        - microphone_coordinates[:, pair_indices[:, 1]]
+    )  # (B, K, D)
+
+
 class GCCPHATProcess(nn.Module):
     """다채널 waveform에서 물리적으로 유효한 raw GCC-PHAT를 추출
 
@@ -153,10 +177,7 @@ class GCCPHATProcess(nn.Module):
         pair_indices: Tensor,
     ) -> Tensor:
         # 마이크 쌍의 상대 위치 벡터
-        pair_displacements = (
-            microphone_coordinates[:, pair_indices[:, 0]]
-            - microphone_coordinates[:, pair_indices[:, 1]]
-        )  # (B, K, D)
+        pair_displacements = pair_displacement(microphone_coordinates, pair_indices)  # (B, K, D)
 
         # 상대 위치 벡터의 norm / 음속
         pair_max_delay_seconds = (

@@ -1,15 +1,13 @@
-"""논문 Figure 1의 reparam 블록과 Eq.(24) KL 정규화 항
+"""논문 Figure 1의 reparam 블록 (Eq 13-16)
 
 VariationalDOAEncoder가 출력하는 vMF posterior 파라미터 (mu, kappa)로부터
 
-    1. sample_von_mises_fisher: 미분 가능한 방식으로 z ~ vMF(mu, kappa)를 샘플링 (Eq 13-16)
-    2. von_mises_fisher_kl_loss: vMF(mu, kappa)와 균등분포 Uniform(S^2) 사이의 KL divergence,
-       즉 Eq 24의 L_KL을 닫힌 형태로 계산 (Eq 25 ELBO의 KL 정규화 항으로 바로 사용됨)
+    sample_von_mises_fisher: 미분 가능한 방식으로 z ~ vMF(mu, kappa)를 샘플링 (Eq 13-16)
 
-    TODO: von_mises_fisher_kl_loss는 인코더 파라미터가 아니라 loss 계산에 쓰이는 함수라
-    나중에 loss 모듈이 생기면 그쪽으로 옮길 것 (지금은 임시로 여기 둠).
+을 제공한다. Eq 24의 KL 정규화 항(von_mises_fisher_kl_loss)은 인코더 파라미터가 아니라
+loss 계산용이라 model/loss.py로 옮겼다.
 
-를 제공한다. 둘 다 학습 가능한 파라미터가 없으므로 nn.Module이 아닌 순수 함수로 둔다.
+학습 가능한 파라미터가 없으므로 nn.Module이 아닌 순수 함수로 둔다.
 
 z가 S^2(3차원 단위구) 위에 있어야 하므로 Gaussian VAE의 z = mu + sigma * epsilon 같은
 reparameterization은 쓸 수 없다. 대신 "북극(canonical mean [0,0,1])을 향한 vMF에서
@@ -122,40 +120,3 @@ def sample_von_mises_fisher(
     # 수치 오차로 인한 norm 이탈을 막는 안전장치 (encoder.py의 mu 정규화와 동일한 패턴)
     z_norm = torch.linalg.vector_norm(z, dim=-1, keepdim=True).clamp_min(eps)
     return z / z_norm
-
-
-def von_mises_fisher_kl_loss(kappa: Tensor, eps: float = 1e-6) -> Tensor:
-    """vMF(mu, kappa)와 Uniform(S^2) 사이의 KL divergence, 즉 Eq 24의 L_KL
-
-        L_KL = kappa * (coth(kappa) - 1/kappa) + log(kappa) - log(sinh(kappa))
-
-    mu에 의존하지 않는 항이므로(균등분포는 방향에 무관) kappa만 입력받는다.
-
-    수치안정화:
-        - coth(kappa)를 cosh/sinh로 직접 계산하면 kappa가 커질 때 overflow하므로
-          coth(kappa) = 1 + 2/(e^{2*kappa} - 1) 형태로 바꾼다. expm1(2*kappa)가 매우 커지거나
-          inf가 되어도 2/expm1(...) -> 0으로 자연스럽게 수렴해 NaN이 나지 않는다.
-        - log(sinh(kappa))도 같은 이유로 k - log(2) + log(1 - e^{-2*kappa})로 바꿔
-          sinh 자체의 overflow를 피한다.
-        - kappa -> 0 근처에서는 log(kappa)와 log1p(-exp(-2*kappa))가 각각 -inf로 발산하고
-          그 차이만 유한하게 남는(상쇄오차, catastrophic cancellation) 문제가 있다.
-          이 텐서는 크기가 작아(프레임 수 정도) 비용 부담이 거의 없으므로, 이 계산 구간만
-          float64로 올려서 유효자리 손실을 줄인 뒤 원래 dtype으로 되돌린다.
-
-    Args:
-        kappa: (B, T', 1) 양수 (vMF의 집중도)
-        eps: kappa=0 근방에서 log/나눗셈이 발산하지 않도록 하는 하한
-
-    Returns:
-        (B, T', 1), 항상 0 이상인 KL divergence
-    """
-
-    kappa64 = kappa.double().clamp_min(eps)
-
-    log_sinh_kappa = kappa64 - math.log(2.0) + torch.log1p(-torch.exp(-2.0 * kappa64))
-    coth_minus_inverse = 1.0 + 2.0 / torch.expm1(2.0 * kappa64) - 1.0 / kappa64
-
-    kl = kappa64 * coth_minus_inverse + torch.log(kappa64) - log_sinh_kappa
-
-    # 이론적으로 KL >= 0이지만 부동소수점 반올림으로 아주 작은 음수가 나올 수 있어 clamp
-    return kl.clamp_min(0.0).to(kappa.dtype)

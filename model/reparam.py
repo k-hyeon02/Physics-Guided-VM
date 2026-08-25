@@ -133,9 +133,9 @@ def von_mises_fisher_kl_loss(kappa: Tensor, eps: float = 1e-6) -> Tensor:
 
     수치안정화:
         - coth(kappa)를 cosh/sinh로 직접 계산하면 kappa가 커질 때 overflow하므로
-          coth(kappa) = 1 + 2/expm1(2*kappa) 형태로 바꾼다. expm1(2*kappa)가 매우 커지거나
+          coth(kappa) = 1 + 2/(e^{2*kappa} - 1) 형태로 바꾼다. expm1(2*kappa)가 매우 커지거나
           inf가 되어도 2/expm1(...) -> 0으로 자연스럽게 수렴해 NaN이 나지 않는다.
-        - log(sinh(kappa))도 같은 이유로 kappa - log(2) + log1p(-exp(-2*kappa))로 바꿔
+        - log(sinh(kappa))도 같은 이유로 k - log(2) + log(1 - e^{-2*kappa})로 바꿔
           sinh 자체의 overflow를 피한다.
         - kappa -> 0 근처에서는 log(kappa)와 log1p(-exp(-2*kappa))가 각각 -inf로 발산하고
           그 차이만 유한하게 남는(상쇄오차, catastrophic cancellation) 문제가 있다.
@@ -143,11 +143,11 @@ def von_mises_fisher_kl_loss(kappa: Tensor, eps: float = 1e-6) -> Tensor:
           float64로 올려서 유효자리 손실을 줄인 뒤 원래 dtype으로 되돌린다.
 
     Args:
-        kappa: (..., 1) 양수 (vMF의 집중도)
+        kappa: (B, T', 1) 양수 (vMF의 집중도)
         eps: kappa=0 근방에서 log/나눗셈이 발산하지 않도록 하는 하한
 
     Returns:
-        (..., 1), 항상 0 이상인 KL divergence
+        (B, T', 1), 항상 0 이상인 KL divergence
     """
 
     kappa64 = kappa.double().clamp_min(eps)

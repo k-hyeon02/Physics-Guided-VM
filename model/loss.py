@@ -71,8 +71,8 @@ def interpolate_time_axis(x: Tensor, target_length: int, time_dim: int = -2) -> 
     둘 다 T'로 선형보간 후 Eq.17-22 계산
 
     Args:
-        x: 임의의 shape, time_dim 위치가 시간축인 텐서 (예: gcc_phat (B,K,T,G),
-            activity mask (B,T))
+        x: 임의의 shape, time_dim 위치가 시간축인 텐서 
+            (예: gcc_phat (B,K,T,G), activity mask (B,T))
         target_length: 목표 시간 프레임 수 T'
         time_dim: x에서 시간축의 위치.
             기본값은 뒤에서 두번째(gcc_phat처럼 시간축 뒤에 delay-bin 축이 남는 경우)
@@ -85,16 +85,19 @@ def interpolate_time_axis(x: Tensor, target_length: int, time_dim: int = -2) -> 
 
     # F.interpolate(mode="linear")는 (N,C,L) 형태를 요구하므로,
     # 시간축을 마지막으로 옮기고 나머지 모든 축은 배치(N)로 접은 뒤 채널(C)=1을 끼워 넣는다
-    moved = x.permute(0,1,3,2)  # (B,K,G,T)
+    time_dim = time_dim % x.ndim
+
+    moved = x.movedim(time_dim, -1)  # (B,K,G,T)
     flattened = moved.reshape(-1, 1, moved.shape[-1])  # (N,1,T)
+
     resized = F.interpolate(
         flattened, size=target_length, mode="linear", align_corners=False
-    )  # (N,1,T')
+    )   # (N,1,T')
     resized = resized.reshape(*moved.shape[:-1], target_length)  # (B,K,G,T')
-    return resized.permute(0, 1, 3, 2)  # (B,K,T',G)
+    return resized.movedim(-1, time_dim)  # 다시 원래 자리로 복원
 
 
-def nomalize_gcc_phat(gcc_phat: Tensor, eps: float = 1e-8) -> Tensor:
+def normalize_gcc_phat(gcc_phat: Tensor, eps: float = 1e-8) -> Tensor:
     """
     delay-bin 축(G) 기준으로 GCC-PHAT를 정규화 (Eq.17-19)
 
@@ -112,7 +115,7 @@ def nomalize_gcc_phat(gcc_phat: Tensor, eps: float = 1e-8) -> Tensor:
     return (gcc_phat - mean) / (variance + eps)  # (B, K, T, G)
 
 
-def input_delay_distribution(g_tilde: Tensor, lambda_sclae: float = 8.0) -> Tensor:
+def input_delay_distribution(g_tilde: Tensor, lambda_scale: float = 8.0) -> Tensor:
     """
     정규화된 GCC-PHAT에 weighted softmax를 적용해 입력 시간지연 분포 p(tau_k|g_k) 계산 (Eq.20)
 
@@ -126,7 +129,7 @@ def input_delay_distribution(g_tilde: Tensor, lambda_sclae: float = 8.0) -> Tens
         (B, K, T', G), 마지막 축(G)에 대해 합이 1인 확률분포
     """
 
-    return torch.softmax(lambda_sclae * g_tilde, dim=-1)
+    return torch.softmax(lambda_scale * g_tilde, dim=-1)
 
 
 def physics_loss(

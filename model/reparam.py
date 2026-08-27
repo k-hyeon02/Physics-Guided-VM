@@ -90,8 +90,13 @@ def sample_von_mises_fisher(
     # 원래 식 w = (1/k)*log((1-u1)e^{-k} + u1 e^{k})는 e^{k}에서 overflow할 수 있으므로
     # e^{k}로 묶어 exp(-2k) 형태로 바꾼다: w = 1 + (1/k)*log(u1 + (1-u1)*exp(-2k))
     # exp(-2k)는 k가 커도 0으로 underflow만 할 뿐 overflow하지 않아 안전
+
+    # 다만 log(u1 + (1-u1)*exp(-2k))를 그대로 쓰면 u1이 정확히 0으로 뽑히고
+    # k가 커서 exp(-2k)까지 0으로 underflow하면 log(0) = -inf가 됨 
+    # 참값은 w = -1(반대쪽 극)인데 그 정보가 사라짐
+    # logaddexp(log(u1), log1p(-u1) - 2k)로 쓰면 두 항을 로그 영역에서 더하므로 u1=0일 때 정확히 -2k가 남아 w = -1이 복원
     kappa_safe = kappa.clamp_min(eps)  # 나눗셈용, 선택(where)과는 독립적으로 clamp
-    log_term = torch.log(u1 + (1.0 - u1) * torch.exp(-2.0 * kappa_safe))
+    log_term = torch.logaddexp(torch.log(u1), torch.log1p(-u1) - 2.0 * kappa_safe)
     # 상쇄오차 방지를 위한 식 변형: w=1+t -> tangential_radius=sqrt(1-w^2)=sqrt(-t*(2+t))
     t = log_term / kappa_safe
     w_general = 1.0 + t

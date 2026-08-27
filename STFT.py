@@ -80,7 +80,7 @@ class ConvSTFT(nn.Module):
 
         self.dim = self.fft_len
 
-    def get_vad_framed(self, vad):
+    def get_vad_frame(self, vad):
         """
         샘플 단위(waveform 레벨) VAD 라벨을 STFT 프레임 단위로 변환
         Arg:

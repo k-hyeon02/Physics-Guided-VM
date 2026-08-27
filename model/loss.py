@@ -25,7 +25,7 @@ import torch.nn.functional as F
 from torch import Tensor
 
 
-def von_mises_fisher_kl_loss(kappa: Tensor, eps: float = 1e-6, max_kappa: float = 1e6) -> Tensor:
+def von_mises_fisher_kl_loss(kappa: Tensor, eps: float = 1e-6) -> Tensor:
     """vMF(mu, kappa)와 Uniform(S^2) 사이의 KL divergence (L_KL, Eq.24)
 
         L_KL = kappa * (coth(kappa) - 1/kappa) + log(kappa) - log(sinh(kappa))
@@ -35,30 +35,22 @@ def von_mises_fisher_kl_loss(kappa: Tensor, eps: float = 1e-6, max_kappa: float 
     수치안정화:
         - coth(kappa)를 cosh/sinh로 직접 계산하면 kappa가 커질 때 overflow하므로
           coth(kappa) = 1 + 2/(e^{2*kappa} - 1) 형태로 변환
-          expm1(2*kappa)가 매우 커지거나 inf가 되어도 2/expm1(...) -> 0으로 자연스럽게 수렴
         - log(sinh(kappa))도 같은 이유로 k - log(2) + log(1 - e^{-2*kappa})로 바꿔
           sinh 자체의 overflow 회피
         - kappa -> 0 근처에서는 log(kappa)와 log1p(-exp(-2*kappa))가 각각 -inf로 발산하고
           그 차이만 유한하게 남는(상쇄오차, catastrophic cancellation) 문제 발생
           이 텐서는 크기가 작아(프레임 수 정도) 비용 부담이 거의 없으므로,
           이 계산 구간만 float64로 올려서 유효자리 손실을 줄인 뒤 원래 dtype으로 복원
-        - kappa 자체가 (gradient 폭주 등으로) inf가 되면 log(kappa)와 log_sinh_kappa가
-          둘 다 inf라서 그 차이가 inf-inf=nan이 되므로, max_kappa로 위쪽도 clamp해서
-          kappa가 유한한 한 KL도 항상 유한하게 만든다 (진짜 값은 kappa->inf일 때
-          KL->inf로 발산하므로, 이 clamp는 근사값을 계산할 뿐 이 근방에서 gradient가
-          의미 있는 방향을 가리키진 않음 -- 그건 gradient clipping 등으로 별도 대응)
 
     Args:
         kappa: (B, T', 1) 양수 (vMF의 집중도)
         eps: kappa=0 근방에서 log/나눗셈이 발산하지 않도록 하는 하한
-        max_kappa: kappa가 inf로 발산해 log(kappa)-log_sinh_kappa가 inf-inf=nan이
-            되는 것을 막는 상한
 
     Returns:
         (B, T', 1), 항상 0 이상인 KL divergence
     """
 
-    kappa64 = kappa.double().clamp(min=eps, max=max_kappa)
+    kappa64 = kappa.double().clamp_min(eps)
 
     log_sinh_kappa = kappa64 - math.log(2.0) + torch.log1p(-torch.exp(-2.0 * kappa64))
     coth_minus_inverse = 1.0 + 2.0 / torch.expm1(2.0 * kappa64) - 1.0 / kappa64
@@ -186,7 +178,7 @@ def elbo_doa_loss(phy_loss: Tensor, kl_loss: Tensor, beta: float) -> Tensor:
 
     # beta=0인 warm-up 구간에서는 kl_loss가 (kappa 폭주 등으로) nan/inf여도
     # 0 * nan = nan, 0 * inf = nan이 되어 버려서 beta=0의 "KL 무시" 의도가
-    # 깨지므로, beta=0일 때는 곱셈 자체를 하지 않고 phy_loss만 반환한다.
+    # 깨지므로, beta=0일 때는 곱셈 자체를 하지 않고 phy_loss만 반환
     if beta == 0.0:
         return phy_loss
     return phy_loss + beta * kl_loss.mean()

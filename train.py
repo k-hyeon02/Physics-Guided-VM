@@ -187,7 +187,7 @@ def forward_losses(
     # encoder - mu: (B,T',3) | kappa: (B,T',1)
     mu, kappa = encoder(gcc_phat, metadata)
     # reparameterization - z: (B,T′,3)  |  warm-up 중엔 샘플링하지 않음
-    z = mu if beta == 0.0 else z = sample_von_mises_fisher(mu, kappa)
+    z = mu if beta == 0.0 else sample_von_mises_fisher(mu, kappa)
     # decoder - displacement: (B,K,D) | p_pred: (B,K,T',G)
     displacement = pair_displacement(mic_coordinate, pairs)
     sigma = F.softplus(raw_sigma)

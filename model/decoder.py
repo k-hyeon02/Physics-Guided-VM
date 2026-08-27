@@ -54,7 +54,8 @@ def physics_based_decoder(
         delay_bins: (B, G) -- GCCPHATProcess가 계산한 physical delay grid (samples 단위)
         speed_of_sound: 음속 c (m/s)
         sample_rate: 샘플링 주파수 F_s
-        sigma: 가우시안 logit의 표준편차 (samples 단위, hyperparameter)
+        sigma: 가우시안 logit의 표준편차 (samples 단위). 
+            학습 가능한 스칼라로 두는 경우 train.py에서 softplus(raw_sigma)를 계산해 전달
 
     Returns:
         (B, K, T', G) p(tau_k|z), 마지막 축(G)에 대해 합이 1인 확률분포

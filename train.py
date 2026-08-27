@@ -168,7 +168,8 @@ def forward_losses(
     frontend: GCCPHATProcess,
     encoder: VariationalDOAEncoder,
     raw_sigma: nn.Parameter,
-    lambda_scale: float
+    lambda_scale: float,
+    beta: float
 ) -> tuple[Tensor, Tensor, Tensor, Tensor]:
     """
     frontend -> encoder -> reparam -> decoder -> physics + KL loss
@@ -185,8 +186,8 @@ def forward_losses(
     metadata = mic_position_metadata(mic_coordinate, pairs)
     # encoder - mu: (B,T',3) | kappa: (B,T',1)
     mu, kappa = encoder(gcc_phat, metadata)
-    # reparameterization - z: (B,T′,3)
-    z = sample_von_mises_fisher(mu, kappa)
+    # reparameterization - z: (B,T′,3)  |  warm-up 중엔 샘플링하지 않음
+    z = mu if beta == 0.0 else z = sample_von_mises_fisher(mu, kappa)
     # decoder - displacement: (B,K,D) | p_pred: (B,K,T',G)
     displacement = pair_displacement(mic_coordinate, pairs)
     sigma = F.softplus(raw_sigma)
@@ -229,7 +230,7 @@ def train_1epoch(
         batch = move_batch_to_device(raw_batch, device)
 
         phy_loss, kl_loss, kappa, sigma = forward_losses(
-            batch, frontend, encoder, raw_sigma, args.lambda_scale
+            batch, frontend, encoder, raw_sigma, args.lambda_scale, beta
         )
         loss = elbo_doa_loss(phy_loss, kl_loss, beta)
 
@@ -276,7 +277,7 @@ def evaluate(
     for raw_batch in loader:
         batch = move_batch_to_device(raw_batch, device)
         phy_loss, kl_loss, _, _ = forward_losses(
-            batch, frontend, encoder, raw_sigma, args.lambda_scale
+            batch, frontend, encoder, raw_sigma, args.lambda_scale, beta=1.0
         )
         totals["phy"] += phy_loss.item()
         totals["kl"] += kl_loss.mean().item()
@@ -409,12 +410,13 @@ def main() -> None:
             "val_phy": val_stats["phy"],
             "val_kl": val_stats["kl"],
         }
+        append_log_row(args.log_csv, log_row)
 
         print(
-            f"epoch {epoch}/{args.epochs} [{profile}]"
-            f"loss={train_stats["loss"]:.4f}"
-            f"Phy={train_stats['phy']:.4f}  |  KL={train_stats['kl']:.4f}"
-            f"kappa={train_stats['kappa']:.2f}  |  beta={beta:.2f}  |  lr={log_row["lr"]:.2e}"
+            f"epoch {epoch}/{args.epochs} [{profile}]  "
+            f"loss={train_stats['loss']:.4f}  |  "
+            f"phy={train_stats['phy']:.4f}  |  kl={train_stats['kl']:.4f}  |  "
+            f"kappa={train_stats['kappa']:.2f}  |  beta={beta:.2f}  |  lr={log_row['lr']:.2e}"
         )
 
         if epoch % args.ckpt_every == 0 or epoch == args.epochs:

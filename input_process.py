@@ -69,9 +69,9 @@ class GCCPHATProcess(nn.Module):
 
     Output:
         (gcc_phat, delay_samples, pair_indices) 튜플
-        gcc_phat의 shape은 (B, M(M-1)/2, T, G)
-        delay_samples는 (B, G) 
-        pair_indices는 (M(M-1)/2, 2)
+        gcc_phat: (B, K, T, G)  K=M(M-1)/2
+        delay_samples: (B, G)
+        pair_indices: (K, 2)
     """
 
     def __init__(
@@ -194,7 +194,7 @@ class GCCPHATProcess(nn.Module):
                 "The physical maximum delay must be smaller than fft_length / 2 "
                 "samples to avoid circular-correlation aliasing."
             )
-        
+
         unit_grid = self.unit_delay_grid.to(
             device=microphone_coordinates.device,
             dtype=microphone_coordinates.dtype,
@@ -269,7 +269,7 @@ class GCCPHATProcess(nn.Module):
         input_audio: Tensor,
         microphone_coordinates: Tensor,
     ) -> tuple[Tensor, Tensor, Tensor]:
-        
+
         input_audio, microphone_coordinates = self._validate_and_batch_inputs(input_audio,
                                                                               microphone_coordinates)
         pairs = microphone_pair_indices(input_audio.shape[1], input_audio.device)  # (K, 2)
@@ -282,8 +282,6 @@ class GCCPHATProcess(nn.Module):
         delay_samples = self._physical_delay_grid(microphone_coordinates, pairs)
         gcc_phat = self._gcc_phat_features(spectrum, pairs, delay_samples)
         return gcc_phat, delay_samples, pairs
-
-
 
     # 보조 공개 API --------------------------------------------------------
     def cross_correlation(

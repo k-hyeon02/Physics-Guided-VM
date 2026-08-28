@@ -13,6 +13,16 @@ Physics-guided variational model 학습
     - lambda(입력 delay 분포 softmax scale) = 8.0
     - sigma(decoder Gaussian 표준편차)는 학습 가능한 스칼라, softplus로 양수 보장
     - G=64 delay bin, STFT window 4096 samples, hop rate 0.75
+
+논문과 다른 점:
+    - encoder의 pair 축 집계를 단순 합산에서 CWSA로 교체 (--aggregation, 기본 cwsa).
+      합산은 출력이 마이크쌍 개수 K에 선형 비례해서 가변 마이크(K=6~66)에서
+      배열 크기가 그대로 활성값·kappa 크기가 되어버린다.
+      --aggregation sum으로 논문 원본 동작을 재현할 수 있다.
+    - physics_loss의 pair 축을 합에서 평균으로 바꾸고, KL에 beta/K를 적용.
+      ELBO 전체를 K로 나눈 것이라 gradient 방향과 최적점은 논문 그대로이고,
+      손실 크기만 마이크쌍 개수에 불변해진다. 이제 train/val, stage 전후,
+      채널 수가 다른 실험끼리 phy 값을 직접 비교할 수 있다.
 """
 import argparse
 import csv
@@ -25,6 +35,7 @@ from torch import Tensor, nn
 
 from data.dataset import SyntheticDOADataset, build_dataloader
 from data.simulate import SimulationConfig
+from data.static import StaticSyntheticDOADataset, StaticSimulationConfig
 from input_process import GCCPHATProcess, pair_displacement
 from mic_metadata import mic_position_metadata
 from model.encoder import VariationalDOAEncoder
@@ -68,6 +79,10 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--train-num-samples", type=int, default=None)
     parser.add_argument("--val-num-samples", type=int, default=None)
     parser.add_argument("--val-profile", default="stage3", choices=["stage1", "stage2", "stage3"])
+    parser.add_argument(
+        "--static", action="store_true",
+        help="이동 음원(SyntheticDOADataset) 대신 정적 단일 음원(StaticSyntheticDOADataset)으로 학습"
+    )
 
     # 채널 수 커리큘럼
     parser.add_argument("--stage1-end-epoch", type=int, default=10)
@@ -88,6 +103,10 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--hop-length", type=int, default=None, help="None이면 win_length*0.75 사용")
     parser.add_argument("--fft-length", type=int, default=4096)
     parser.add_argument("--num-delay-bins", type=int, default=64)
+    parser.add_argument(
+        "--aggregation", default="cwsa", choices=["cwsa", "sum"],
+        help="encoder의 pair 축 집계 방식. cwsa=softmax 가중합+표준편차(K에 거의 불변), sum=논문 원본"
+    )
     parser.add_argument("--sample-rate", type=int, default=16_000)
     parser.add_argument("--speed-of-sound", type=float, default=343.0)
 
@@ -145,7 +164,10 @@ def build_model(
         speed_of_sound=args.speed_of_sound,
     ).to(device)
 
-    encoder = VariationalDOAEncoder(num_delay_bins=args.num_delay_bins).to(device)
+    encoder = VariationalDOAEncoder(
+        num_delay_bins=args.num_delay_bins,
+        aggregation=args.aggregation,
+    ).to(device)
 
     # sigma는 논문 5.3절대로 학습 가능한 스칼라: softplus(raw_sigma)로 양수 보장 (decoder.py 참고)
     raw_sigma = nn.Parameter(
@@ -170,12 +192,13 @@ def forward_losses(
     raw_sigma: nn.Parameter,
     lambda_scale: float,
     beta: float
-) -> tuple[Tensor, Tensor, Tensor, Tensor]:
+) -> tuple[Tensor, Tensor, Tensor, Tensor, int]:
     """
     frontend -> encoder -> reparam -> decoder -> physics + KL loss
 
     Returns:
-        (phy_loss, kl_loss, kappa, sigma)
+        (phy_loss, kl_loss, kappa, sigma, num_pairs)
+        num_pairs는 elbo_doa_loss가 beta/K를 적용하는 데 필요한 이 배치의 K다.
     """
 
     audio = batch["input_audio"]
@@ -208,7 +231,7 @@ def forward_losses(
     # Loss
     phy_loss = physics_loss(p_target, p_pred, activity_mask)
     kl_loss = von_mises_fisher_kl_loss(kappa)
-    return phy_loss, kl_loss, kappa, sigma
+    return phy_loss, kl_loss, kappa, sigma, pairs.shape[0]
 
 
 def train_1epoch(
@@ -223,16 +246,16 @@ def train_1epoch(
     epoch: int
 ) -> dict[str, float]:
     encoder.train()
-    totals = {"loss": 0.0, "phy": 0.0, "kl": 0.0, "kappa": 0.0}
+    totals = {"loss": 0.0, "phy": 0.0, "kl": 0.0, "kappa": 0.0, "pairs": 0.0}
     num_batches = 0
 
     for step, raw_batch in enumerate(loader):
         batch = move_batch_to_device(raw_batch, device)
 
-        phy_loss, kl_loss, kappa, sigma = forward_losses(
+        phy_loss, kl_loss, kappa, sigma, num_pairs = forward_losses(
             batch, frontend, encoder, raw_sigma, args.lambda_scale, beta
         )
-        loss = elbo_doa_loss(phy_loss, kl_loss, beta)
+        loss = elbo_doa_loss(phy_loss, kl_loss, beta, num_pairs)
 
         optimizer.zero_grad()
         loss.backward()
@@ -246,14 +269,15 @@ def train_1epoch(
         totals["phy"] += phy_loss.item()
         totals["kl"] += kl_loss.mean().item()
         totals["kappa"] += kappa.mean().item()
+        totals["pairs"] += float(num_pairs)
         num_batches += 1
 
         if step % args.log_every == 0:
             print(
                 f"[epoch {epoch}][step {step}/{len(loader)}] "
                 f"loss={loss.item():.4f}  |  "
-                f"phy={phy_loss.item():.4f}  |  kl={kl_loss.mean().item():.4f}  |  "
-                f"sigma={sigma.item():.4f}  |  beta={beta:.2f}"
+                f"phy/pair={phy_loss.item():.4f}  |  kl={kl_loss.mean().item():.4f}  |  "
+                f"sigma={sigma.item():.4f}  |  K={num_pairs}  |  beta_eff={beta / num_pairs:.4f}"
             )
 
     num_batches = max(num_batches, 1)
@@ -276,7 +300,7 @@ def evaluate(
 
     for raw_batch in loader:
         batch = move_batch_to_device(raw_batch, device)
-        phy_loss, kl_loss, _, _ = forward_losses(
+        phy_loss, kl_loss, _, _, _ = forward_losses(
             batch, frontend, encoder, raw_sigma, args.lambda_scale, beta=1.0
         )
         totals["phy"] += phy_loss.item()
@@ -340,9 +364,14 @@ def main() -> None:
     torch.manual_seed(args.seed)  # PyTorch의 전역 랜덤 시드를 고정
     device = resolve_device(args.device)
 
-    simulation_config = SimulationConfig(sample_rate=args.sample_rate)
+    dataset_cls = StaticSyntheticDOADataset if args.static else SyntheticDOADataset
+    simulation_config = (
+        StaticSimulationConfig(sample_rate=args.sample_rate)
+        if args.static
+        else SimulationConfig(sample_rate=args.sample_rate)
+    )
 
-    train_dataset = SyntheticDOADataset(
+    train_dataset = dataset_cls(
         librispeech_root=args.train_librispeech_root,
         ms_snsd_root=args.train_ms_snsd_root,
         num_samples=args.train_num_samples,
@@ -351,7 +380,7 @@ def main() -> None:
         seed=args.seed,
         simulation_config=simulation_config,
     )
-    val_dataset = SyntheticDOADataset(
+    val_dataset = dataset_cls(
         librispeech_root=args.val_librispeech_root,
         ms_snsd_root=args.val_ms_snsd_root,
         num_samples=args.val_num_samples,
@@ -407,6 +436,7 @@ def main() -> None:
             "train_phy": train_stats["phy"],
             "train_kl": train_stats["kl"],
             "train_kappa": train_stats["kappa"],
+            "train_pairs": train_stats["pairs"],
             "val_phy": val_stats["phy"],
             "val_kl": val_stats["kl"],
         }
@@ -415,8 +445,9 @@ def main() -> None:
         print(
             f"epoch {epoch}/{args.epochs} [{profile}]  "
             f"loss={train_stats['loss']:.4f}  |  "
-            f"phy={train_stats['phy']:.4f}  |  kl={train_stats['kl']:.4f}  |  "
-            f"kappa={train_stats['kappa']:.2f}  |  beta={beta:.2f}  |  lr={log_row['lr']:.2e}"
+            f"phy/pair={train_stats['phy']:.4f}  |  kl={train_stats['kl']:.4f}  |  "
+            f"kappa={train_stats['kappa']:.2f}  |  K={train_stats['pairs']:.1f}  |  "
+            f"beta={beta:.2f}  |  lr={log_row['lr']:.2e}"
         )
 
         if epoch % args.ckpt_every == 0 or epoch == args.epochs:

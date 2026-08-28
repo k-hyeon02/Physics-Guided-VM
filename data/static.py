@@ -8,13 +8,7 @@ from typing import Sequence
 import numpy as np
 import torch
 
-from .dataset import (
-    SyntheticDOADataset,
-    _clean_speech_and_vad,
-    _crop_or_pad,
-    _load_audio_mono,
-    _resample_audio,
-)
+from .dataset import SyntheticDOADataset
 from .simulate import (
     FS,
     N_SPK,
@@ -35,7 +29,7 @@ class StaticSimulationConfig:
     """정적 단일 음원 시뮬레이션 조건."""
 
     sample_rate: int = FS
-    segment_seconds: float = 4.0
+    segment_seconds: float = 20.0
     max_speakers: int = N_SPK
     snr_db: tuple[float, float] = (5.0, 30.0)
     noise_sir_db: tuple[float, float] = (-15.0, 15.0)
@@ -282,36 +276,13 @@ class StaticSyntheticDOADataset(SyntheticDOADataset):
             channel_schedule=channel_schedule,
         )
 
-    def _sample_utterance(
-        self,
-        path: str,
-        rng: np.random.Generator,
-    ) -> tuple[np.ndarray, np.ndarray]:
-        """단일 발화의 무작위 4초 구간과 활동 마스크 생성."""
-
-        speech, source_rate = _load_audio_mono(path)
-        speech = _resample_audio(
-            speech,
-            source_rate,
-            self.simulation_config.sample_rate,
-        )
-        speech = _crop_or_pad(
-            speech,
-            self.simulation_config.segment_samples,
-            rng,
-        )
-        return _clean_speech_and_vad(
-            speech,
-            self.simulation_config.sample_rate,
-        )
-
     def __getitem__(self, index: int) -> dict[str, torch.Tensor]:
         seed = (
             self.seed * 1_000_003 + self._epoch * self.num_samples + int(index)
         ) & 0xFFFFFFFF
         rng = np.random.default_rng(seed)
-        speech_path = self.speech_files[int(rng.integers(0, len(self.speech_files)))]
-        speech, source_vad = self._sample_utterance(speech_path, rng)
+        chapter = self.speech_chapters[index % len(self.speech_chapters)]
+        speech, source_vad = self._sample_speech(chapter, rng)
         noise_path = self.noise_files[int(rng.integers(0, len(self.noise_files)))]
         coherent_noise = self._sample_noise(noise_path, rng)
         microphone_coordinates = self._sample_mic_coordinates(

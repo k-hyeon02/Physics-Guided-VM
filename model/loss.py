@@ -16,6 +16,20 @@ Loss function (Eq.17-25)
         p(tau_k|g_k)와 decoder가 예측한 p(tau_k|z) 사이의 cross entropy, 활동마스크(a_x)로 무음 구간을 제외하고 가중평균 (Eq.21-22)
     6. elbo_doa_loss: 
         physics_loss와 KL 정규화 항을 beta로 결합한 최종 손실 (Eq.25)
+
+논문과 다른 점 (가변 마이크 대응):
+    논문은 pair 축을 합으로 줄인다. 조건부 독립 가정에서 log-likelihood가 합이므로
+    그 자체는 옳지만, 마이크쌍 개수 K가 6(4채널)에서 66(12채널)까지 변하는
+    가변 마이크에서는 손실 크기가 그대로 K에 비례해 버린다.
+
+    그래서 ELBO 전체를 K로 나눈다:
+
+        (1/K)[sum_k CE_k + beta * KL] = mean_k CE_k + (beta/K) * KL
+
+    physics_loss가 pair 평균을 쓰고 elbo_doa_loss가 beta를 K로 나누는 것은
+    이 하나의 재척도화의 양쪽 절반이다. 한쪽만 적용하면 증거와 prior의 비율이
+    K배 어긋나 (마이크가 많을수록 prior가 세지는) 다른 모델이 되어 버린다.
+    전역 1/K 배이므로 gradient 방향과 최적점은 논문 그대로다.
 """
 
 import math
@@ -148,11 +162,18 @@ def physics_loss(
         eps: log(0) 발산을 막는 epsilon
 
     Returns:
-        scalar, 활동 구간에 대해 가중평균한 cross entropy (Eq.22)
+        scalar, 활동 구간에 대해 가중평균한 pair당 cross entropy (Eq.22를 K로 나눈 값)
+
+    pair 축을 합이 아니라 평균으로 줄이므로 반환값이 마이크쌍 개수 K에 비례해
+    커지지 않는다. 대신 elbo_doa_loss가 KL 쪽에 beta/K를 적용해 두 항의 비율을
+    논문과 같게 유지한다 (모듈 docstring 참고).
+
+    B와 T' 축은 원래부터 (마스크) 평균이고 G 축만이 cross entropy 정의상 합이므로,
+    K를 평균으로 두는 편이 축 처리에도 일관된다.
     """
 
     cross_entropy = -(p_target * torch.log(p_pred.clamp_min(eps))).sum(dim=-1)  # (B,K,T'): sum_{tau_k} delay-bin(G) 축 합
-    cross_entropy = cross_entropy.sum(dim=1)  # (B, T'): sum_k
+    cross_entropy = cross_entropy.mean(dim=1)  # (B, T'): mean_k -- K에 비례하지 않도록
 
     mask = activity_mask.to(cross_entropy.dtype)  # (B, T')
     weighted_sum = (cross_entropy * mask).sum()
@@ -160,25 +181,45 @@ def physics_loss(
     return weighted_sum / normalizer
 
 
-def elbo_doa_loss(phy_loss: Tensor, kl_loss: Tensor, beta: float) -> Tensor:
+def elbo_doa_loss(
+    phy_loss: Tensor,
+    kl_loss: Tensor,
+    beta: float,
+    num_pairs: int,
+) -> Tensor:
     """
     physics loss와 KL 정규화 항을 beta로 결합한 최종 학습 손실 (Eq. 25)
 
+    physics_loss가 pair 평균이므로 KL에는 beta 대신 beta/K를 적용한다.
+    둘을 합치면 논문 ELBO를 정확히 1/K배 한 것이 되어, 손실 크기만 마이크쌍
+    개수에 불변해지고 증거 대 prior의 비율은 논문 그대로 유지된다.
+
+        (1/K)[sum_k CE_k + beta * KL] = mean_k CE_k + (beta/K) * KL
+
+    beta를 그대로 두면 원래 목적함수에서 beta가 K배 세진 것과 같아진다.
+    마이크가 많아질수록(=증거가 많아질수록) prior를 더 세게 당기는 셈이라
+    가변 마이크에서는 방향이 정반대가 된다.
+
     Args:
         phy_loss: scalar
-            Eq.21-22의 cross entropy (physics_loss의 출력)
+            Eq.21-22를 pair 평균으로 줄인 값 (physics_loss의 출력)
         kl_loss: (B, T', 1)
             Eq.24의 KL divergence (von_mises_fisher_kl_loss의 출력)
         beta: KL 항 가중치
             첫 5% epoch는 0(posterior collapse 방지), 이후 1.0
+        num_pairs: 이 배치의 마이크쌍 개수 K.
+            ChannelGroupBatchSampler가 배치를 채널 수로 묶으므로 배치 안에서는 상수다.
 
     Returns:
         scalar, 최종 학습 손실
     """
+
+    if num_pairs < 1:
+        raise ValueError(f"num_pairs must be positive, got {num_pairs}.")
 
     # beta=0인 warm-up 구간에서는 kl_loss가 (kappa 폭주 등으로) nan/inf여도
     # 0 * nan = nan, 0 * inf = nan이 되어 버려서 beta=0의 "KL 무시" 의도가
     # 깨지므로, beta=0일 때는 곱셈 자체를 하지 않고 phy_loss만 반환
     if beta == 0.0:
         return phy_loss
-    return phy_loss + beta * kl_loss.mean()
+    return phy_loss + (beta / num_pairs) * kl_loss.mean()

@@ -25,6 +25,7 @@ from torch import Tensor, nn
 
 from data.dataset import SyntheticDOADataset, build_dataloader
 from data.simulate import SimulationConfig
+from data.streaming_pipeline import build_streaming_dataloader
 from input_process import GCCPHATProcess, pair_displacement
 from mic_metadata import mic_position_metadata
 from model.encoder import VariationalDOAEncoder
@@ -93,6 +94,29 @@ def build_arg_parser() -> argparse.ArgumentParser:
 
     # 실행/로깅
     parser.add_argument("--num-workers", type=int, default=4)
+    parser.add_argument(
+        "--streaming-simulation",
+        action="store_true",
+        help=(
+            "CPU simulation 준비 worker와 단일 gpuRIR renderer를 분리한 "
+            "streaming pipeline 사용"
+        ),
+    )
+    parser.add_argument(
+        "--cpu-prep-workers",
+        type=int,
+        default=None,
+        help=(
+            "streaming pipeline의 CPU 준비 worker 수 "
+            "(미지정 시 --num-workers 사용)"
+        ),
+    )
+    parser.add_argument(
+        "--simulation-prefetch-batches",
+        type=int,
+        default=2,
+        help="streaming pipeline이 미리 준비할 batch 수",
+    )
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--device", default="cuda")
     parser.add_argument("--checkpoint-dir", default=os.path.join(PROJECT_ROOT, "checkpoints"))
@@ -335,6 +359,69 @@ def append_log_row(csv_path: str, row: dict[str, float | int | str]) -> None:
         writer.writerow(row)
 
 
+def build_training_loaders(args, train_dataset, val_dataset):
+    """선택한 simulation 방식으로 train/validation loader를 생성한다."""
+
+    if not args.streaming_simulation:
+        print(f"data loader: standard (workers={args.num_workers})")
+        train_loader = build_dataloader(
+            train_dataset,
+            batch_size=args.batch_size,
+            num_workers=args.num_workers,
+            shuffle=True,
+            drop_last=True,
+        )
+        val_loader = build_dataloader(
+            val_dataset,
+            batch_size=args.batch_size,
+            num_workers=args.num_workers,
+            shuffle=False,
+            drop_last=False,
+        )
+        return train_loader, val_loader
+
+    if (
+        type(train_dataset) is not SyntheticDOADataset
+        or type(val_dataset) is not SyntheticDOADataset
+    ):
+        raise ValueError(
+            "--streaming-simulation은 moving SyntheticDOADataset만 지원합니다"
+        )
+
+    num_prepare_workers = (
+        args.num_workers
+        if args.cpu_prep_workers is None
+        else args.cpu_prep_workers
+    )
+    if num_prepare_workers < 1:
+        raise ValueError("streaming simulation의 CPU 준비 worker 수는 1 이상이어야 합니다")
+    if args.simulation_prefetch_batches < 1:
+        raise ValueError("--simulation-prefetch-batches는 1 이상이어야 합니다")
+
+    print(
+        "data loader: streaming "
+        f"(CPU prepare workers={num_prepare_workers}, gpuRIR renderers=1, "
+        f"prefetch batches={args.simulation_prefetch_batches})"
+    )
+    train_loader = build_streaming_dataloader(
+        train_dataset,
+        batch_size=args.batch_size,
+        num_prepare_workers=num_prepare_workers,
+        shuffle=True,
+        prefetch_batches=args.simulation_prefetch_batches,
+        drop_last=True,
+    )
+    val_loader = build_streaming_dataloader(
+        val_dataset,
+        batch_size=args.batch_size,
+        num_prepare_workers=num_prepare_workers,
+        shuffle=False,
+        prefetch_batches=args.simulation_prefetch_batches,
+        drop_last=False,
+    )
+    return train_loader, val_loader
+
+
 def main() -> None:
     args = build_arg_parser().parse_args()
     torch.manual_seed(args.seed)  # PyTorch의 전역 랜덤 시드를 고정
@@ -361,11 +448,8 @@ def main() -> None:
         simulation_config=simulation_config,
     )
 
-    train_loader = build_dataloader(
-        train_dataset, batch_size=args.batch_size, num_workers=args.num_workers, shuffle=True
-    )
-    val_loader = build_dataloader(
-        val_dataset, batch_size=args.batch_size, num_workers=args.num_workers, shuffle=False
+    train_loader, val_loader = build_training_loaders(
+        args, train_dataset, val_dataset
     )
 
     frontend, encoder, raw_sigma = build_model(args, device)

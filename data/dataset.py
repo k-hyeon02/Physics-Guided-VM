@@ -16,7 +16,13 @@ from scipy.signal import resample_poly
 from torch.utils.data import DataLoader, Dataset, Sampler
 
 from .mic_arrays import get_fixed_array, random_rotate, sample_dynamic_array_vectorized
-from .simulate import N_SPK, SimulationConfig, simulate_one_sample
+from .simulate import (
+    N_SPK,
+    SimulationConfig,
+    SimulationRequest,
+    prepare_simulation,
+    render_simulation,
+)
 
 PROFILE_SPECS = {
     "stage1": {"array_type": "tetrahedron", "channel_range": (4, 4)},
@@ -200,14 +206,19 @@ class SyntheticDOADataset(Dataset):
         self.speech_files = [
             path for chapter in self.speech_chapters for path in chapter
         ]
-        self.noise_files = _discover_audio_files(
-            ms_snsd_root,
-            ("*.wav", "*.flac"),
-        )
-        if not self.noise_files:
-            raise FileNotFoundError(
-                f"MS-SNSD 오디오 파일을 찾을 수 없음: {ms_snsd_root!r}"
+        # Experiment 1의 AWGN은 외부 잡음 음원을 사용하지 않는다. 이 경우
+        # MS-SNSD를 읽거나 잡음 파일 선택으로 RNG 상태를 소비하지 않는다.
+        if getattr(self.simulation_config, "noise_mode", "mixed") == "awgn":
+            self.noise_files = []
+        else:
+            self.noise_files = _discover_audio_files(
+                ms_snsd_root,
+                ("*.wav", "*.flac"),
             )
+            if not self.noise_files:
+                raise FileNotFoundError(
+                    f"MS-SNSD 오디오 파일을 찾을 수 없음: {ms_snsd_root!r}"
+                )
 
         self.channel_schedule = (
             np.asarray(channel_schedule, dtype=np.int32)
@@ -312,21 +323,25 @@ class SyntheticDOADataset(Dataset):
             rng,
         )
 
-    def __getitem__(self, index: int) -> dict[str, torch.Tensor]:
+    def prepare_sample(self, index: int) -> SimulationRequest:
+        """파일 로딩과 난수 표본추출만 수행해 gpuRIR 렌더링 요청을 준비."""
+
         seed = (
             self.seed * 1_000_003 + self._epoch * self.num_samples + int(index)
         ) & 0xFFFFFFFF
         rng = np.random.default_rng(seed)
         chapter = self.speech_chapters[index % len(self.speech_chapters)]
         speech, source_vad = self._sample_speech(chapter, rng)
-        noise_index = int(rng.integers(0, len(self.noise_files)))
-        coherent_noise = self._sample_noise(self.noise_files[noise_index], rng)
+        coherent_noise = None
+        if self.noise_files:
+            noise_index = int(rng.integers(0, len(self.noise_files)))
+            coherent_noise = self._sample_noise(self.noise_files[noise_index], rng)
         microphone_coordinates = self._sample_mic_coordinates(
             int(self.channel_counts[index]),
             rng,
         )
 
-        sample = simulate_one_sample(
+        return prepare_simulation(
             speeches=[speech],
             microphone_coordinates=microphone_coordinates,
             rng=rng,
@@ -334,6 +349,12 @@ class SyntheticDOADataset(Dataset):
             vads=[source_vad],
             coherent_noise=coherent_noise,
         )
+
+    @staticmethod
+    def render_sample(request: SimulationRequest) -> dict[str, torch.Tensor]:
+        """준비된 요청을 gpuRIR로 렌더링하고 학습용 Tensor로 변환."""
+
+        sample = render_simulation(request)
         return {
             "input_audio": torch.from_numpy(sample["input_audio"]),
             "vad": torch.from_numpy(sample["vad"]),
@@ -346,6 +367,11 @@ class SyntheticDOADataset(Dataset):
             "rt60": torch.tensor(sample["rt60"], dtype=torch.float32),
             "snr_db": torch.tensor(sample["snr_db"], dtype=torch.float32),
         }
+
+    def __getitem__(self, index: int) -> dict[str, torch.Tensor]:
+        """기존 Dataset API를 유지하며 준비와 렌더링을 순서대로 실행."""
+
+        return self.render_sample(self.prepare_sample(index))
 
 
 class ChannelGroupBatchSampler(Sampler[list[int]]):
@@ -407,14 +433,19 @@ def build_dataloader(
     num_workers: int,
     shuffle: bool,
     prefetch_factor: int = 1,
+    drop_last: bool = True,
 ) -> DataLoader:
-    """채널 수 그룹화를 적용한 데이터 로더 생성."""
+    """채널 수 그룹화를 적용한 데이터 로더 생성.
+
+    학습은 고정 배치 크기를 위해 ``drop_last=True``를 쓰고, 검증/평가는
+    전체 chapter를 포함하도록 반드시 ``drop_last=False``를 지정한다.
+    """
 
     sampler = ChannelGroupBatchSampler(
         channel_counts=dataset,
         batch_size=batch_size,
         shuffle=shuffle,
-        drop_last=True,
+        drop_last=drop_last,
     )
     options: dict = {
         "batch_sampler": sampler,

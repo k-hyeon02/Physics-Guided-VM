@@ -20,6 +20,8 @@ class SimulationConfig:
     segment_seconds: float = 20.0
     max_speakers: int = N_SPK
     snr_db: tuple[float, float] = (5.0, 30.0)
+    noise_mode: str = "mixed"
+    awgn_power_reference: str = "auralized"
     noise_sir_db: tuple[float, float] = (-15.0, 15.0)
     rt60_s: tuple[float, float] = (0.2, 1.0)
     room_size_min_m: tuple[float, float, float] = (3.0, 3.0, 2.5)
@@ -58,6 +60,44 @@ class SimulationConfig:
             raise ValueError("microphone_position_std_m은 음수가 될 수 없음")
         if self.noise_min_distance_m <= 0.0:
             raise ValueError("noise_min_distance_m은 양수여야 함")
+        if self.noise_mode not in ("mixed", "awgn"):
+            raise ValueError(
+                f"noise_mode은 'mixed' 또는 'awgn'이어야 함: {self.noise_mode!r}"
+            )
+        if self.awgn_power_reference not in ("auralized", "direct_path"):
+            raise ValueError(
+                "awgn_power_reference는 'auralized' 또는 'direct_path'여야 함: "
+                f"{self.awgn_power_reference!r}"
+            )
+
+
+@dataclass(frozen=True)
+class SimulationRequest:
+    """CPU 준비가 끝난 뒤 단일 gpuRIR worker로 전달할 렌더링 요청.
+
+    모든 난수 표본은 준비 단계에서 확정한다. 따라서 요청이 준비된 순서와
+    gpuRIR 렌더링이 완료되는 순서가 달라도 ``(seed, epoch, index)``가 같은
+    샘플은 같은 장면과 잡음을 사용한다.
+    """
+
+    config: SimulationConfig
+    speech: np.ndarray
+    source_vad: np.ndarray
+    coherent_noise: np.ndarray | None
+    microphone_coordinates: np.ndarray
+    room_size: np.ndarray
+    rt60: float
+    absorption_weights: np.ndarray
+    array_center: np.ndarray
+    microphone_positions: np.ndarray
+    trajectory_points: np.ndarray
+    timestamps: np.ndarray
+    trajectory: np.ndarray
+    spherical: np.ndarray
+    snr_db: float
+    white_noise: np.ndarray
+    noise_position: np.ndarray | None
+    noise_sir_db: float | None
 
 
 def _trim_or_pad(signal: np.ndarray, length: int) -> np.ndarray:
@@ -90,6 +130,25 @@ def _normalize_peak(signal: np.ndarray, peak: float = 0.95) -> np.ndarray:
 
     maximum = float(np.max(np.abs(signal))) + 1e-10
     return (signal * (peak / maximum)).astype(np.float32)
+
+
+def _active_acoustic_power(
+    signal: np.ndarray,
+    frame_length: int = 512,
+    hop_length: int = 256,
+) -> float:
+    """Neural-SRP 시뮬레이터와 같은 무음 제외 음향 파워를 계산한다."""
+
+    signal = np.ascontiguousarray(signal, dtype=np.float64)
+    if signal.size < frame_length:
+        return float(np.mean(np.square(signal), dtype=np.float64) + 1e-10)
+    frames = np.lib.stride_tricks.sliding_window_view(signal, frame_length)[::hop_length]
+    frame_power = np.mean(np.square(frames), axis=-1, dtype=np.float64)
+    threshold = 0.01 * float(frame_power.max(initial=0.0))
+    active = frame_power[frame_power > threshold]
+    if active.size == 0:
+        return 1e-10
+    return float(active.mean(dtype=np.float64))
 
 
 def _sample_room(
@@ -348,9 +407,9 @@ def _sample_noise_position(
     raise RuntimeError("AGG-RL 공간 상관 잡음원 위치 표본추출 실패")
 
 
-def _mix_noise(
+def _mix_prepared_noise(
     microphone_signals: np.ndarray,
-    coherent_noise: np.ndarray,
+    coherent_noise: np.ndarray | None,
     room_size: np.ndarray,
     microphone_positions: np.ndarray,
     array_center: np.ndarray,
@@ -359,17 +418,40 @@ def _mix_noise(
     t_max: float,
     image_count: Sequence[int],
     snr_db: float,
-    rng: np.random.Generator,
     config: SimulationConfig,
+    white_noise: np.ndarray,
+    noise_position: np.ndarray | None,
+    noise_sir_db: float | None,
+    direct_path_signals: np.ndarray | None = None,
 ) -> np.ndarray:
-    """MS-SNSD 공간 상관 잡음과 채널별 백색 잡음의 AGG-RL 혼합."""
+    """준비 단계에서 확정한 잡음 표본을 렌더링된 신호에 혼합."""
 
-    noise_position = _sample_noise_position(
-        room_size,
-        array_center,
-        rng,
-        config,
-    )
+    if getattr(config, "noise_mode", "mixed") == "awgn":
+        # 논문 문구(auralized signal 기준)와 논문이 참조한 Neural-SRP 공개
+        # 시뮬레이터(direct-path 기준)를 같은 조건에서 비교할 수 있게 한다.
+        # 기본값은 기존 실행과 동일한 auralized이며, 어느 경우든 각 마이크에
+        # 서로 독립적인 표준정규 AWGN을 더한다.
+        power_reference = getattr(config, "awgn_power_reference", "auralized")
+        if power_reference == "direct_path":
+            if direct_path_signals is None:
+                raise ValueError(
+                    "direct_path AWGN power reference에는 direct_path_signals가 필요함"
+                )
+            reference_signals = direct_path_signals
+        else:
+            reference_signals = microphone_signals
+        reference_power = np.mean(
+            [_active_acoustic_power(channel) for channel in reference_signals],
+            dtype=np.float64,
+        )
+        noise_scale = np.sqrt(reference_power / (10.0 ** (snr_db / 10.0)))
+        return (microphone_signals + white_noise * noise_scale).astype(np.float32)
+
+    if coherent_noise is None:
+        raise ValueError("mixed 잡음 모드에는 coherent_noise가 필요함")
+    if noise_position is None or noise_sir_db is None:
+        raise ValueError("mixed 잡음 모드에는 준비된 잡음 위치와 SIR이 필요함")
+
     coherent_rirs = _render_trajectory_rirs(
         room_size=room_size,
         source_positions=noise_position[None],
@@ -387,9 +469,7 @@ def _mix_noise(
         sample_rate=config.sample_rate,
         length=config.segment_samples,
     )
-    white_noise = rng.standard_normal(microphone_signals.shape).astype(np.float32)
 
-    noise_sir_db = float(rng.uniform(*config.noise_sir_db))
     white_scale = _scale_to_db(
         coherent_signals[0],
         white_noise[0],
@@ -402,6 +482,58 @@ def _mix_noise(
         -snr_db,
     )
     return _normalize_peak(microphone_signals + mixed_noise * noise_scale)
+
+
+def _mix_noise(
+    microphone_signals: np.ndarray,
+    coherent_noise: np.ndarray | None,
+    room_size: np.ndarray,
+    microphone_positions: np.ndarray,
+    array_center: np.ndarray,
+    beta: np.ndarray,
+    t_diff: float,
+    t_max: float,
+    image_count: Sequence[int],
+    snr_db: float,
+    rng: np.random.Generator,
+    config: SimulationConfig,
+    direct_path_signals: np.ndarray | None = None,
+) -> np.ndarray:
+    """기존 호출 호환용 잡음 표본추출 및 혼합 함수."""
+
+    if getattr(config, "noise_mode", "mixed") == "awgn":
+        noise_position = None
+        noise_sir_db = None
+        white_noise = rng.standard_normal(microphone_signals.shape).astype(np.float32)
+    else:
+        if coherent_noise is None:
+            raise ValueError("mixed 잡음 모드에는 coherent_noise가 필요함")
+        noise_position = _sample_noise_position(
+            room_size,
+            array_center,
+            rng,
+            config,
+        )
+        white_noise = rng.standard_normal(microphone_signals.shape).astype(np.float32)
+        noise_sir_db = float(rng.uniform(*config.noise_sir_db))
+
+    return _mix_prepared_noise(
+        microphone_signals=microphone_signals,
+        coherent_noise=coherent_noise,
+        room_size=room_size,
+        microphone_positions=microphone_positions,
+        array_center=array_center,
+        beta=beta,
+        t_diff=t_diff,
+        t_max=t_max,
+        image_count=image_count,
+        snr_db=snr_db,
+        config=config,
+        white_noise=white_noise,
+        noise_position=noise_position,
+        noise_sir_db=noise_sir_db,
+        direct_path_signals=direct_path_signals,
+    )
 
 
 def _propagate_vad(
@@ -425,15 +557,15 @@ def _propagate_vad(
     return (mean_activity > threshold).astype(np.float32)
 
 
-def simulate_one_sample(
+def prepare_simulation(
     speeches: Sequence[np.ndarray],
-    coherent_noise: np.ndarray,
+    coherent_noise: np.ndarray | None,
     microphone_coordinates: np.ndarray,
     rng: np.random.Generator,
     config: SimulationConfig | None = None,
     vads: Sequence[np.ndarray] | None = None,
-) -> dict[str, np.ndarray]:
-    """단일 이동 음원의 다채널 학습 샘플 생성."""
+) -> SimulationRequest:
+    """gpuRIR를 호출하지 않고 단일 샘플의 모든 난수와 CPU 입력을 준비."""
 
     config = config or SimulationConfig()
     config.validate()
@@ -452,7 +584,10 @@ def simulate_one_sample(
 
     room_size, rt60, absorption_weights = _sample_room(rng, config)
     array_center = _sample_array_center(room_size, rng, config)
-    microphone_coordinates = np.asarray(microphone_coordinates, dtype=np.float64)
+    microphone_coordinates = np.asarray(
+        microphone_coordinates,
+        dtype=np.float64,
+    ).copy()
     if config.microphone_position_std_m > 0.0:
         microphone_coordinates = microphone_coordinates + rng.normal(
             0.0,
@@ -473,16 +608,70 @@ def simulate_one_sample(
     )
     spherical = _cartesian_to_spherical(trajectory - array_center[None])
 
+    # 기존 simulate_one_sample과 같은 순서로 모든 NumPy 난수를 확정한다.
+    # 그 사이의 gpuRIR 호출은 NumPy Generator 상태를 소비하지 않는다.
+    snr_db = float(rng.uniform(*config.snr_db))
+    if config.noise_mode == "awgn":
+        prepared_coherent_noise = None
+        noise_position = None
+        noise_sir_db = None
+        white_noise = rng.standard_normal(
+            (microphone_positions.shape[0], length)
+        ).astype(np.float32)
+    else:
+        if coherent_noise is None:
+            raise ValueError("mixed 잡음 모드에는 coherent_noise가 필요함")
+        prepared_coherent_noise = _trim_or_pad(coherent_noise, length)
+        noise_position = _sample_noise_position(
+            room_size,
+            array_center,
+            rng,
+            config,
+        )
+        white_noise = rng.standard_normal(
+            (microphone_positions.shape[0], length)
+        ).astype(np.float32)
+        noise_sir_db = float(rng.uniform(*config.noise_sir_db))
+
+    return SimulationRequest(
+        config=config,
+        speech=speech,
+        source_vad=source_vad,
+        coherent_noise=prepared_coherent_noise,
+        microphone_coordinates=microphone_coordinates,
+        room_size=room_size,
+        rt60=rt60,
+        absorption_weights=absorption_weights,
+        array_center=array_center,
+        microphone_positions=microphone_positions,
+        trajectory_points=trajectory_points,
+        timestamps=timestamps,
+        trajectory=trajectory,
+        spherical=spherical,
+        snr_db=snr_db,
+        white_noise=white_noise,
+        noise_position=noise_position,
+        noise_sir_db=noise_sir_db,
+    )
+
+
+def render_simulation(
+    request: SimulationRequest,
+) -> dict[str, np.ndarray]:
+    """준비된 요청의 gpuRIR 연산을 수행해 기존 샘플 형식으로 반환."""
+
+    config = request.config
+    length = config.segment_samples
     beta, t_diff, t_max, image_count = _rir_parameters(
-        room_size,
-        rt60,
-        absorption_weights,
+        request.room_size,
+        request.rt60,
+        request.absorption_weights,
         config,
     )
     trajectory_rirs = _render_trajectory_rirs(
-        room_size=room_size,
-        source_positions=trajectory_points,
-        microphone_positions=microphone_positions,
+        room_size=request.room_size,
+        source_positions=request.trajectory_points,
+        microphone_positions=request.microphone_positions,
         beta=beta,
         t_diff=t_diff,
         t_max=t_max,
@@ -490,54 +679,89 @@ def simulate_one_sample(
         sample_rate=config.sample_rate,
     )
     microphone_signals = _simulate_trajectory(
-        speech,
+        request.speech,
         trajectory_rirs,
-        timestamps,
+        request.timestamps,
         config.sample_rate,
         length,
     )
 
     direct_path_rirs = _render_direct_path_rirs(
-        room_size,
-        trajectory_points,
-        microphone_positions,
+        request.room_size,
+        request.trajectory_points,
+        request.microphone_positions,
         beta,
         config.sample_rate,
     )
-    snr_db = float(rng.uniform(*config.snr_db))
-    mixture = _mix_noise(
+    direct_path_signals = None
+    if (
+        config.noise_mode == "awgn"
+        and getattr(config, "awgn_power_reference", "auralized") == "direct_path"
+    ):
+        direct_path_signals = _simulate_trajectory(
+            request.speech,
+            direct_path_rirs,
+            request.timestamps,
+            config.sample_rate,
+            length,
+        )
+    mixture = _mix_prepared_noise(
         microphone_signals=microphone_signals,
-        coherent_noise=coherent_noise,
-        room_size=room_size,
-        microphone_positions=microphone_positions,
-        array_center=array_center,
+        coherent_noise=request.coherent_noise,
+        room_size=request.room_size,
+        microphone_positions=request.microphone_positions,
+        array_center=request.array_center,
         beta=beta,
         t_diff=t_diff,
         t_max=t_max,
         image_count=image_count,
-        snr_db=snr_db,
-        rng=rng,
+        snr_db=request.snr_db,
         config=config,
+        white_noise=request.white_noise,
+        noise_position=request.noise_position,
+        noise_sir_db=request.noise_sir_db,
+        direct_path_signals=direct_path_signals,
     )
 
     propagated_vad = _propagate_vad(
-        source_vad,
+        request.source_vad,
         direct_path_rirs,
-        timestamps,
+        request.timestamps,
         config.sample_rate,
         length,
     )
-    spherical_position = spherical.T[None].astype(np.float32)
+    spherical_position = request.spherical.T[None].astype(np.float32)
 
     return {
         "input_audio": mixture.astype(np.float32),
         "vad": propagated_vad[None],
-        "mic_coordinate": microphone_coordinates.astype(np.float32),
+        "mic_coordinate": request.microphone_coordinates.astype(np.float32),
         "spherical_position": spherical_position,
         "polar_position": spherical_position[:, :, 0],
-        "source_trajectory": trajectory.T[None].astype(np.float32),
+        "source_trajectory": request.trajectory.T[None].astype(np.float32),
         "n_spk": np.int64(N_SPK),
-        "room_size": room_size.astype(np.float32),
-        "rt60": np.float32(rt60),
-        "snr_db": np.float32(snr_db),
+        "room_size": request.room_size.astype(np.float32),
+        "rt60": np.float32(request.rt60),
+        "snr_db": np.float32(request.snr_db),
     }
+
+
+def simulate_one_sample(
+    speeches: Sequence[np.ndarray],
+    coherent_noise: np.ndarray | None,
+    microphone_coordinates: np.ndarray,
+    rng: np.random.Generator,
+    config: SimulationConfig | None = None,
+    vads: Sequence[np.ndarray] | None = None,
+) -> dict[str, np.ndarray]:
+    """기존 API를 유지하며 CPU 준비 후 gpuRIR 렌더링을 순서대로 실행."""
+
+    request = prepare_simulation(
+        speeches=speeches,
+        coherent_noise=coherent_noise,
+        microphone_coordinates=microphone_coordinates,
+        rng=rng,
+        config=config,
+        vads=vads,
+    )
+    return render_simulation(request)

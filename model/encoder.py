@@ -20,6 +20,24 @@ class FeatureWisePReLU(nn.Module):
         return torch.where(x >= 0, x, self.weight * x)
 
 
+def channelwise_softmax_aggregation(x: Tensor, pair_dim: int = 1) -> Tensor:
+    """CWSA로 pair 축을 softmax 가중합과 가중 표준편차로 집계한다.
+
+    Args:
+        x: 일반적으로 ``(B, K, T', H)`` 형태인 pairwise feature.
+        pair_dim: 마이크 pair 축의 위치.
+
+    Returns:
+        pair 축이 제거되고 마지막 축에 가중합과 가중 표준편차가 이어 붙은 텐서.
+    """
+
+    weights = x.softmax(dim=pair_dim)
+    weighted = weights * x
+    total = weighted.sum(dim=pair_dim)
+    spread = weighted.std(dim=pair_dim, unbiased=False)
+    return torch.cat((total, spread), dim=-1)
+
+
 class ConvBlock(nn.Module):
     """Figure 2(b): metadata로 조건화된 2D conv block
 
@@ -71,13 +89,13 @@ class VariationalDOAEncoder(nn.Module):
     """논문 Figure 2(a): pairwise-shared variational DOA encoder
 
     마이크쌍마다 가중치를 공유하는 conv+GRU+MLP 인코더를 통과시킨 뒤
-    pair 축으로 합산하여 방향(mu)과 집중도(kappa)의 von Mises-Fisher
+    pair 축을 집계하여 방향(mu)과 집중도(kappa)의 von Mises-Fisher
     posterior 파라미터를 얻는다.
 
     처리 순서 (pair별 가중치 공유):
 
     3x ConvBlock -> GRU(2 Layer) -> pairwise MLP(2 Layer)
-        -> (pair 합산) -> final MLP -> (mu, kappa)
+        -> (pair 집계) -> final MLP -> (mu, kappa)
 
     Args:
         conv_channels: conv block 출력 채널 수
@@ -87,6 +105,8 @@ class VariationalDOAEncoder(nn.Module):
         metadata_dim: pairwise metadata (v_i, v_j) 차원
         gru_layers: unidirectional GRU 레이어 수
         hidden_size: GRU/MLP의 공통 hidden 크기
+        aggregation: ``sum``은 기존 단순 합산, ``cwsa``는 channel-wise
+            softmax 가중합과 가중 표준편차를 사용한다.
         eps: 0-division 및 zero-direction fallback 판정에 쓰는 epsilon
 
     Input:
@@ -108,9 +128,16 @@ class VariationalDOAEncoder(nn.Module):
         metadata_dim: int = 6,
         gru_layers: int = 2,
         hidden_size: int = 128,
+        aggregation: str = "sum",
         eps: float = 1e-8,
     ) -> None:
         super().__init__()
+
+        if aggregation not in ("sum", "cwsa"):
+            raise ValueError(
+                f"aggregation must be 'sum' or 'cwsa', got {aggregation!r}."
+            )
+        self.aggregation = aggregation
 
         self.conv_blocks = nn.ModuleList(
             ConvBlock(
@@ -142,8 +169,9 @@ class VariationalDOAEncoder(nn.Module):
             FeatureWisePReLU(num_parameters=hidden_size),
         )
 
+        aggregated_size = hidden_size * 2 if aggregation == "cwsa" else hidden_size
         self.posterior_head = nn.Sequential(
-            nn.Linear(hidden_size, hidden_size),
+            nn.Linear(aggregated_size, hidden_size),
             FeatureWisePReLU(num_parameters=hidden_size),
             nn.Linear(hidden_size, 4),  # 앞 3개는 mu의 raw 좌표, 마지막은 raw kappa
         )
@@ -167,10 +195,14 @@ class VariationalDOAEncoder(nn.Module):
         hidden, _ = self.gru(hidden)  # (B*K, T', H)
         hidden = self.pairwise_mlp(hidden)  # (B*K, T', H)
 
-        # pair 축 합산
+        # pair 축 집계
         num_output_frames = hidden.shape[1]
-        hidden = hidden.reshape(batch_size, num_pairs, num_output_frames, -1).sum(dim=1)  
-        # (B, K, T', H) -> (B, T', H) -- pair 축 합산 이후이므로 pair 순서에 불변
+        hidden = hidden.reshape(batch_size, num_pairs, num_output_frames, -1)
+        if self.aggregation == "cwsa":
+            hidden = channelwise_softmax_aggregation(hidden)
+        else:
+            hidden = hidden.sum(dim=1)
+        # 어느 집계든 pair 축에 대해 대칭이므로 pair 순서에 불변
 
         raw_posterior = self.posterior_head(hidden)  # (B, T', 4)
         raw_direction = raw_posterior[..., :3]  # mu

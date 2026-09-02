@@ -80,6 +80,21 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--lr-start", type=float, default=5e-4)
     parser.add_argument("--lr-end", type=float, default=5e-5)
     parser.add_argument("--beta-warmup-fraction", type=float, default=0.05)
+    parser.add_argument(
+        "--beta-after-warmup",
+        type=float,
+        default=1.0,
+        help="warm-up 종료 후 KL 가중치 beta (기본값: 논문 설정 1.0)",
+    )
+    parser.add_argument(
+        "--physics-pair-reduction",
+        default=None,
+        choices=["sum", "mean"],
+        help=(
+            "physics loss의 pair 축 reduction. 지정하지 않으면 "
+            "SUM encoder는 sum, CWSA encoder는 mean을 사용"
+        ),
+    )
     parser.add_argument("--lambda-scale", type=float, default=8.0)
     parser.add_argument("--sigma-init", type=float, default=1.0)
     parser.add_argument("--grad-clip-norm", type=float, default=0.0, help="0이면 비활성화")
@@ -89,6 +104,12 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--hop-length", type=int, default=None, help="None이면 win_length*0.75 사용")
     parser.add_argument("--fft-length", type=int, default=4096)
     parser.add_argument("--num-delay-bins", type=int, default=64)
+    parser.add_argument(
+        "--aggregation",
+        default="sum",
+        choices=["sum", "cwsa"],
+        help="encoder pair 집계: sum=기존 논문 방식, cwsa=channel-wise softmax aggregation",
+    )
     parser.add_argument("--sample-rate", type=int, default=16_000)
     parser.add_argument("--speed-of-sound", type=float, default=343.0)
 
@@ -146,11 +167,16 @@ def profile_for_epoch(epoch: int, stage1_end: int, stage2_end: int) -> str:
     return "stage3"
 
 
-def beta_for_epoch(epoch: int, total_epochs: int, warmup_fraction: float) -> float:
-    """Eq.25의 beta: 처음 warmup_fraction만큼은 0, 이후 1.0 (posterior collapse 방지)."""
+def beta_for_epoch(
+    epoch: int,
+    total_epochs: int,
+    warmup_fraction: float,
+    beta_after_warmup: float = 1.0,
+) -> float:
+    """Eq.25의 beta: 처음 warmup_fraction만큼은 0, 이후 지정한 값."""
 
     warmup_epochs = round(total_epochs * warmup_fraction)
-    return 0.0 if epoch <= warmup_epochs else 1.0
+    return 0.0 if epoch <= warmup_epochs else beta_after_warmup
 
 
 def build_model(
@@ -169,7 +195,10 @@ def build_model(
         speed_of_sound=args.speed_of_sound,
     ).to(device)
 
-    encoder = VariationalDOAEncoder(num_delay_bins=args.num_delay_bins).to(device)
+    encoder = VariationalDOAEncoder(
+        num_delay_bins=args.num_delay_bins,
+        aggregation=args.aggregation,
+    ).to(device)
 
     # sigma는 논문 5.3절대로 학습 가능한 스칼라: softplus(raw_sigma)로 양수 보장 (decoder.py 참고)
     raw_sigma = nn.Parameter(
@@ -193,13 +222,14 @@ def forward_losses(
     encoder: VariationalDOAEncoder,
     raw_sigma: nn.Parameter,
     lambda_scale: float,
-    beta: float
-) -> tuple[Tensor, Tensor, Tensor, Tensor]:
+    beta: float,
+    physics_pair_reduction: str | None = None,
+) -> tuple[Tensor, Tensor, Tensor, Tensor, int]:
     """
     frontend -> encoder -> reparam -> decoder -> physics + KL loss
 
     Returns:
-        (phy_loss, kl_loss, kappa, sigma)
+        (phy_loss, kl_loss, kappa, sigma, num_pairs)
     """
 
     audio = batch["input_audio"]
@@ -230,9 +260,19 @@ def forward_losses(
     activity_mask = interpolate_time_axis(activity_mask, target_length=latent_frames, time_dim=-1)
 
     # Loss
-    phy_loss = physics_loss(p_target, p_pred, activity_mask)
+    num_pairs = pairs.shape[0]
+    if physics_pair_reduction is None:
+        physics_pair_reduction = (
+            "mean" if encoder.aggregation == "cwsa" else "sum"
+        )
+    phy_loss = physics_loss(
+        p_target,
+        p_pred,
+        activity_mask,
+        pair_reduction=physics_pair_reduction,
+    )
     kl_loss = von_mises_fisher_kl_loss(kappa)
-    return phy_loss, kl_loss, kappa, sigma
+    return phy_loss, kl_loss, kappa, sigma, num_pairs
 
 
 def train_1epoch(
@@ -253,10 +293,33 @@ def train_1epoch(
     for step, raw_batch in enumerate(loader):
         batch = move_batch_to_device(raw_batch, device)
 
-        phy_loss, kl_loss, kappa, sigma = forward_losses(
-            batch, frontend, encoder, raw_sigma, args.lambda_scale, beta
+        phy_loss, kl_loss, kappa, sigma, num_pairs = forward_losses(
+            batch,
+            frontend,
+            encoder,
+            raw_sigma,
+            args.lambda_scale,
+            beta,
+            physics_pair_reduction=args.physics_pair_reduction,
         )
-        loss = elbo_doa_loss(phy_loss, kl_loss, beta)
+        average_pair_loss = (
+            args.physics_pair_reduction == "mean"
+            or (
+                args.physics_pair_reduction is None
+                and encoder.aggregation == "cwsa"
+            )
+        )
+        normalize_beta_by_pairs = (
+            encoder.aggregation == "cwsa" and average_pair_loss
+        )
+        beta_num_pairs = num_pairs if normalize_beta_by_pairs else None
+        effective_beta = beta if beta_num_pairs is None else beta / beta_num_pairs
+        loss = elbo_doa_loss(
+            phy_loss,
+            kl_loss,
+            beta,
+            num_pairs=beta_num_pairs,
+        )
 
         optimizer.zero_grad()
         loss.backward()
@@ -273,11 +336,14 @@ def train_1epoch(
         num_batches += 1
 
         if step % args.log_every == 0:
+            phy_label = "phy/pair" if average_pair_loss else "phy"
+            beta_label = "beta_eff" if normalize_beta_by_pairs else "beta"
             print(
                 f"[epoch {epoch}][step {step}/{len(loader)}] "
                 f"loss={loss.item():.4f}  |  "
-                f"phy={phy_loss.item():.4f}  |  kl={kl_loss.mean().item():.4f}  |  "
-                f"sigma={sigma.item():.4f}  |  beta={beta:.2f}"
+                f"{phy_label}={phy_loss.item():.4f}  |  kl={kl_loss.mean().item():.4f}  |  "
+                f"sigma={sigma.item():.4f}  |  K={num_pairs}  |  "
+                f"{beta_label}={effective_beta:.6f}"
             )
 
     num_batches = max(num_batches, 1)
@@ -300,8 +366,14 @@ def evaluate(
 
     for raw_batch in loader:
         batch = move_batch_to_device(raw_batch, device)
-        phy_loss, kl_loss, _, _ = forward_losses(
-            batch, frontend, encoder, raw_sigma, args.lambda_scale, beta=1.0
+        phy_loss, kl_loss, _, _, _ = forward_losses(
+            batch,
+            frontend,
+            encoder,
+            raw_sigma,
+            args.lambda_scale,
+            beta=args.beta_after_warmup,
+            physics_pair_reduction=args.physics_pair_reduction,
         )
         totals["phy"] += phy_loss.item()
         totals["kl"] += kl_loss.mean().item()
@@ -469,7 +541,12 @@ def main() -> None:
         profile = profile_for_epoch(epoch, args.stage1_end_epoch, args.stage2_end_epoch)
         train_dataset.set_epoch(epoch)
         train_dataset.set_profile(profile)
-        beta = beta_for_epoch(epoch, args.epochs, args.beta_warmup_fraction)
+        beta = beta_for_epoch(
+            epoch,
+            args.epochs,
+            args.beta_warmup_fraction,
+            args.beta_after_warmup,
+        )
 
         train_stats = train_1epoch(
             train_loader, frontend, encoder, raw_sigma, optimizer, beta, args, device, epoch
@@ -500,7 +577,7 @@ def main() -> None:
             f"epoch {epoch}/{args.epochs} [{profile}]  "
             f"loss={train_stats['loss']:.4f}  |  "
             f"phy={train_stats['phy']:.4f}  |  kl={train_stats['kl']:.4f}  |  "
-            f"kappa={train_stats['kappa']:.2f}  |  beta={beta:.2f}  |  lr={log_row['lr']:.2e}"
+            f"kappa={train_stats['kappa']:.2f}  |  beta={beta:.6f}  |  lr={log_row['lr']:.2e}"
         )
 
         if epoch % args.ckpt_every == 0 or epoch == args.epochs:

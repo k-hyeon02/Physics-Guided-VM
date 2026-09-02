@@ -135,7 +135,8 @@ def physics_loss(
     p_target: Tensor,
     p_pred: Tensor,
     activity_mask: Tensor,
-    eps: float = 1e-8
+    eps: float = 1e-8,
+    pair_reduction: str = "sum",
 ) -> Tensor:
     """
     p(tau_k|g_k)와 p(tau_k|z) 사이의 cross entropy, 활동마스크로 가중평균 (Eq.21-22)
@@ -146,13 +147,23 @@ def physics_loss(
         activity_mask: (B, T'), 0(무음)~1(활성) 범위
             interpolate_time_axis로 시간축을 T'에 맞춤
         eps: log(0) 발산을 막는 epsilon
+        pair_reduction: ``sum``은 논문 원본, ``mean``은 마이크 pair 수와
+            무관한 physics loss를 만들 때 사용한다.
 
     Returns:
         scalar, 활동 구간에 대해 가중평균한 cross entropy (Eq.22)
     """
 
+    if pair_reduction not in ("sum", "mean"):
+        raise ValueError(
+            f"pair_reduction must be 'sum' or 'mean', got {pair_reduction!r}."
+        )
+
     cross_entropy = -(p_target * torch.log(p_pred.clamp_min(eps))).sum(dim=-1)  # (B,K,T'): sum_{tau_k} delay-bin(G) 축 합
-    cross_entropy = cross_entropy.sum(dim=1)  # (B, T'): sum_k
+    if pair_reduction == "mean":
+        cross_entropy = cross_entropy.mean(dim=1)
+    else:
+        cross_entropy = cross_entropy.sum(dim=1)
 
     mask = activity_mask.to(cross_entropy.dtype)  # (B, T')
     weighted_sum = (cross_entropy * mask).sum()
@@ -160,7 +171,12 @@ def physics_loss(
     return weighted_sum / normalizer
 
 
-def elbo_doa_loss(phy_loss: Tensor, kl_loss: Tensor, beta: float) -> Tensor:
+def elbo_doa_loss(
+    phy_loss: Tensor,
+    kl_loss: Tensor,
+    beta: float,
+    num_pairs: int | None = None,
+) -> Tensor:
     """
     physics loss와 KL 정규화 항을 beta로 결합한 최종 학습 손실 (Eq. 25)
 
@@ -169,16 +185,23 @@ def elbo_doa_loss(phy_loss: Tensor, kl_loss: Tensor, beta: float) -> Tensor:
             Eq.21-22의 cross entropy (physics_loss의 출력)
         kl_loss: (B, T', 1)
             Eq.24의 KL divergence (von_mises_fisher_kl_loss의 출력)
-        beta: KL 항 가중치
-            첫 5% epoch는 0(posterior collapse 방지), 이후 1.0
+        beta: KL 항의 기본 가중치
+            첫 5% epoch는 0(posterior collapse 방지), 이후 설정값
+        num_pairs: 지정하면 CWSA 버전처럼 실제 KL 가중치를 ``beta / K``로
+            조정한다. ``None``이면 기존 SUM 버전처럼 beta를 그대로 사용한다.
 
     Returns:
         scalar, 최종 학습 손실
     """
+
+    if num_pairs is not None and num_pairs < 1:
+        raise ValueError(f"num_pairs must be positive, got {num_pairs}.")
 
     # beta=0인 warm-up 구간에서는 kl_loss가 (kappa 폭주 등으로) nan/inf여도
     # 0 * nan = nan, 0 * inf = nan이 되어 버려서 beta=0의 "KL 무시" 의도가
     # 깨지므로, beta=0일 때는 곱셈 자체를 하지 않고 phy_loss만 반환
     if beta == 0.0:
         return phy_loss
-    return phy_loss + beta * kl_loss.mean()
+
+    effective_beta = beta if num_pairs is None else beta / num_pairs
+    return phy_loss + effective_beta * kl_loss.mean()

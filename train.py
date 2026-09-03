@@ -18,13 +18,16 @@ import argparse
 import csv
 import math
 import os
+import random
 
+import numpy as np
 import torch
 import torch.nn.functional as F
 from torch import Tensor, nn
 
-from data.dataset import SyntheticDOADataset, build_dataloader
+from data.dataset import PROFILE_SPECS, SyntheticDOADataset, build_dataloader
 from data.simulate import SimulationConfig
+from data.static import StaticSyntheticDOADataset, StaticSimulationConfig
 from data.streaming_pipeline import build_streaming_dataloader
 from input_process import GCCPHATProcess, pair_displacement
 from mic_metadata import mic_position_metadata
@@ -68,7 +71,39 @@ def build_arg_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--train-num-samples", type=int, default=None)
     parser.add_argument("--val-num-samples", type=int, default=None)
-    parser.add_argument("--val-profile", default="stage3", choices=["stage1", "stage2", "stage3"])
+    parser.add_argument(
+        "--train-profile",
+        default=None,
+        choices=sorted(PROFILE_SPECS),
+        help="지정하면 stage curriculum 대신 이 배열 profile을 전 epoch에 고정",
+    )
+    parser.add_argument(
+        "--val-profile", default="stage3", choices=sorted(PROFILE_SPECS)
+    )
+    parser.add_argument(
+        "--no-rotate-arrays",
+        action="store_true",
+        help="훈련·검증 배열의 무작위 3D 회전을 비활성화",
+    )
+    parser.add_argument(
+        "--noise-mode",
+        default="mixed",
+        choices=["mixed", "awgn"],
+        help="moving-source 잡음: mixed=기존 MS-SNSD+백색, awgn=원논문 Experiment 1",
+    )
+    parser.add_argument(
+        "--awgn-power-reference",
+        default="auralized",
+        choices=["auralized", "direct_path"],
+        help=(
+            "AWGN SNR 파워 기준: auralized=잔향 포함 마이크 신호, "
+            "direct_path=Neural-SRP 공개 시뮬레이터의 직접경로 신호"
+        ),
+    )
+    parser.add_argument(
+        "--static", action="store_true",
+        help="이동 음원(SyntheticDOADataset) 대신 정적 단일 음원(StaticSyntheticDOADataset)으로 학습"
+    )
 
     # 채널 수 커리큘럼
     parser.add_argument("--stage1-end-epoch", type=int, default=10)
@@ -97,6 +132,12 @@ def build_arg_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--lambda-scale", type=float, default=8.0)
     parser.add_argument("--sigma-init", type=float, default=1.0)
+    parser.add_argument(
+        "--fixed-sigma",
+        type=float,
+        default=None,
+        help="지정하면 decoder sigma를 이 값으로 고정하고 optimizer에서 제외",
+    )
     parser.add_argument("--grad-clip-norm", type=float, default=0.0, help="0이면 비활성화")
 
     # frontend / encoder 구성
@@ -200,9 +241,15 @@ def build_model(
         aggregation=args.aggregation,
     ).to(device)
 
-    # sigma는 논문 5.3절대로 학습 가능한 스칼라: softplus(raw_sigma)로 양수 보장 (decoder.py 참고)
+    sigma_value = args.fixed_sigma if args.fixed_sigma is not None else args.sigma_init
+    if sigma_value <= 0.0:
+        raise ValueError("sigma는 0보다 커야 합니다")
+
+    # 기본값은 논문 5.3절대로 학습 가능한 스칼라다. --fixed-sigma를 지정한
+    # 대조 실험에서는 같은 표현을 유지하되 optimizer에서 제외한다.
     raw_sigma = nn.Parameter(
-        torch.tensor(inverse_softplus(args.sigma_init), device=device)
+        torch.tensor(inverse_softplus(sigma_value), device=device),
+        requires_grad=args.fixed_sigma is None,
     )
 
     return frontend, encoder, raw_sigma
@@ -325,7 +372,7 @@ def train_1epoch(
         loss.backward()
         if args.grad_clip_norm > 0:
             nn.utils.clip_grad_norm_(
-                list(encoder.parameters()) + [raw_sigma], args.grad_clip_norm
+                optimizer.param_groups[0]["params"], args.grad_clip_norm
             )
         optimizer.step()
 
@@ -399,6 +446,12 @@ def save_checkpoint(
             "raw_sigma": raw_sigma.detach().cpu(),
             "optimizer": optimizer.state_dict(),
             "scheduler": scheduler.state_dict(),
+            "python_rng_state": random.getstate(),
+            "numpy_rng_state": np.random.get_state(),
+            "torch_rng_state": torch.get_rng_state(),
+            "cuda_rng_state_all": (
+                torch.cuda.get_rng_state_all() if torch.cuda.is_available() else None
+            ),
         },
         path
     )
@@ -418,6 +471,15 @@ def load_checkpoint(
         raw_sigma.copy_(checkpoint["raw_sigma"].to(device))
     optimizer.load_state_dict(checkpoint["optimizer"])
     scheduler.load_state_dict(checkpoint["scheduler"])
+    if "python_rng_state" in checkpoint:
+        random.setstate(checkpoint["python_rng_state"])
+    if "numpy_rng_state" in checkpoint:
+        np.random.set_state(checkpoint["numpy_rng_state"])
+    if "torch_rng_state" in checkpoint:
+        torch.set_rng_state(checkpoint["torch_rng_state"].cpu())
+    cuda_rng_state_all = checkpoint.get("cuda_rng_state_all")
+    if cuda_rng_state_all is not None and torch.cuda.is_available():
+        torch.cuda.set_rng_state_all([state.cpu() for state in cuda_rng_state_all])
     return checkpoint["epoch"] + 1
 
 
@@ -496,21 +558,38 @@ def build_training_loaders(args, train_dataset, val_dataset):
 
 def main() -> None:
     args = build_arg_parser().parse_args()
-    torch.manual_seed(args.seed)  # PyTorch의 전역 랜덤 시드를 고정
+    random.seed(args.seed)
+    np.random.seed(args.seed)
+    torch.manual_seed(args.seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(args.seed)
     device = resolve_device(args.device)
 
-    simulation_config = SimulationConfig(sample_rate=args.sample_rate)
+    dataset_cls = StaticSyntheticDOADataset if args.static else SyntheticDOADataset
+    simulation_config = (
+        StaticSimulationConfig(sample_rate=args.sample_rate)
+        if args.static
+        else SimulationConfig(
+            sample_rate=args.sample_rate,
+            noise_mode=args.noise_mode,
+            awgn_power_reference=args.awgn_power_reference,
+        )
+    )
 
-    train_dataset = SyntheticDOADataset(
+    initial_train_profile = args.train_profile or "stage1"
+    rotate_arrays = not args.no_rotate_arrays
+
+    train_dataset = dataset_cls(
         librispeech_root=args.train_librispeech_root,
         ms_snsd_root=args.train_ms_snsd_root,
         num_samples=args.train_num_samples,
-        profile="stage1",
+        profile=initial_train_profile,
         batch_size=args.batch_size,
         seed=args.seed,
         simulation_config=simulation_config,
+        rotate_arrays=rotate_arrays,
     )
-    val_dataset = SyntheticDOADataset(
+    val_dataset = dataset_cls(
         librispeech_root=args.val_librispeech_root,
         ms_snsd_root=args.val_ms_snsd_root,
         num_samples=args.val_num_samples,
@@ -518,6 +597,7 @@ def main() -> None:
         batch_size=args.batch_size,
         seed=args.seed,
         simulation_config=simulation_config,
+        rotate_arrays=rotate_arrays,
     )
 
     train_loader, val_loader = build_training_loaders(
@@ -525,9 +605,10 @@ def main() -> None:
     )
 
     frontend, encoder, raw_sigma = build_model(args, device)
-    optimizer = torch.optim.Adam(
-        list(encoder.parameters()) + [raw_sigma], lr=args.lr_start
-    )
+    optimizer_parameters = list(encoder.parameters())
+    if raw_sigma.requires_grad:
+        optimizer_parameters.append(raw_sigma)
+    optimizer = torch.optim.Adam(optimizer_parameters, lr=args.lr_start)
     # gamma: 매 epoch마다 현재 lr에 곱해지는 감쇠 비율
     gamma = (args.lr_end / args.lr_start) ** (1.0 / args.epochs)
     scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=gamma)
@@ -538,7 +619,11 @@ def main() -> None:
         print(f"resume checkpoint: {args.resume} (epoch {start_epoch}부터)")
 
     for epoch in range(start_epoch, args.epochs + 1):
-        profile = profile_for_epoch(epoch, args.stage1_end_epoch, args.stage2_end_epoch)
+        profile = (
+            args.train_profile
+            if args.train_profile is not None
+            else profile_for_epoch(epoch, args.stage1_end_epoch, args.stage2_end_epoch)
+        )
         train_dataset.set_epoch(epoch)
         train_dataset.set_profile(profile)
         beta = beta_for_epoch(

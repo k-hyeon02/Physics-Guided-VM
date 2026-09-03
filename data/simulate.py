@@ -21,7 +21,7 @@ class SimulationConfig:
     max_speakers: int = N_SPK
     snr_db: tuple[float, float] = (5.0, 30.0)
     noise_mode: str = "mixed"
-    awgn_power_reference: str = "auralized"
+    awgn_power_reference: str = "direct_path"
     noise_sir_db: tuple[float, float] = (-15.0, 15.0)
     rt60_s: tuple[float, float] = (0.2, 1.0)
     room_size_min_m: tuple[float, float, float] = (3.0, 3.0, 2.5)
@@ -427,11 +427,11 @@ def _mix_prepared_noise(
     """준비 단계에서 확정한 잡음 표본을 렌더링된 신호에 혼합."""
 
     if getattr(config, "noise_mode", "mixed") == "awgn":
-        # 논문 문구(auralized signal 기준)와 논문이 참조한 Neural-SRP 공개
-        # 시뮬레이터(direct-path 기준)를 같은 조건에서 비교할 수 있게 한다.
-        # 기본값은 기존 실행과 동일한 auralized이며, 어느 경우든 각 마이크에
-        # 서로 독립적인 표준정규 AWGN을 더한다.
-        power_reference = getattr(config, "awgn_power_reference", "auralized")
+        # 논문이 참조한 Neural-SRP 공개 시뮬레이터와 같이 직접경로 신호의
+        # 활성 power를 기본 SNR 기준으로 사용한다. auralized는 과거 실험을
+        # 재현하기 위한 선택지이며, 어느 경우든 각 마이크에 서로 독립적인
+        # 표준정규 AWGN을 더한다.
+        power_reference = getattr(config, "awgn_power_reference", "direct_path")
         if power_reference == "direct_path":
             if direct_path_signals is None:
                 raise ValueError(
@@ -696,7 +696,7 @@ def render_simulation(
     direct_path_signals = None
     if (
         config.noise_mode == "awgn"
-        and getattr(config, "awgn_power_reference", "auralized") == "direct_path"
+        and getattr(config, "awgn_power_reference", "direct_path") == "direct_path"
     ):
         direct_path_signals = _simulate_trajectory(
             request.speech,

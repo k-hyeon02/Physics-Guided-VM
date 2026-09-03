@@ -21,7 +21,22 @@
 
 ## 잡음 조건
 
-잡음은 AGG-RL의 단일 합성 방식만 사용.
+`SimulationConfig.noise_mode`로 논문 Experiment 1과 기존 AGG-RL 합성을 구분.
+
+### `awgn` (논문 Experiment 1)
+
+- 기본값은 논문이 참조한 Neural-SRP 공개 시뮬레이터와 같은 `direct_path`
+  power reference
+- 직접경로 마이크 신호의 활성 음향 파워를 512-sample window/256-sample
+  hop으로 계산
+- 12개 채널의 활성 파워를 평균하여 목표 SNR 5–30 dB의 공통 noise scale 결정
+- 마이크마다 독립적인 표준정규 AWGN 추가
+- MS-SNSD 파일을 읽거나 잡음 파일 선택으로 RNG를 소비하지 않음
+- 과거 auralized-power 실험 재현에는 `--awgn-power-reference auralized` 사용
+- 어느 power reference를 선택해도 최종 입력은 전체 잔향 신호이며, 직접경로
+  신호는 AWGN scale 계산에만 사용됨
+
+### `mixed` (기존 AGG-RL)
 
 - 방 안에서 배열 중심으로부터 2.5 m 이상 떨어진 고정 잡음원 배치
 - MS-SNSD 신호의 RIR 합성을 통한 공간 상관 잡음 생성

@@ -93,10 +93,11 @@ def build_arg_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--awgn-power-reference",
-        default="auralized",
+        default="direct_path",
         choices=["auralized", "direct_path"],
         help=(
-            "AWGN SNR 파워 기준: auralized=잔향 포함 마이크 신호, "
+            "AWGN SNR 파워 기준(기본 direct_path): "
+            "auralized=잔향 포함 마이크 신호, "
             "direct_path=Neural-SRP 공개 시뮬레이터의 직접경로 신호"
         ),
     )

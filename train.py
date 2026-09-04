@@ -44,13 +44,16 @@ from model.loss import (
 )
 
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+MODEL_VARIANT = "sum"
 
 def inverse_softplus(value: float) -> float:
     """softplus(x) = value가 되는 x를 계산 (sigma 초기값 설정용)"""
     return math.log(math.expm1(value))
 
 def build_arg_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Training Physics-based variational model")
+    parser = argparse.ArgumentParser(
+        description="Training Physics-based variational model (SUM branch)"
+    )
 
     # 데이터 경로
     parser.add_argument(
@@ -148,9 +151,9 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--num-delay-bins", type=int, default=64)
     parser.add_argument(
         "--aggregation",
-        default="sum",
-        choices=["sum", "cwsa"],
-        help="encoder pair 집계: sum=기존 논문 방식, cwsa=channel-wise softmax aggregation",
+        default=MODEL_VARIANT,
+        choices=[MODEL_VARIANT],
+        help="encoder pair 집계 (이 브랜치는 기존 논문 방식인 sum으로 고정)",
     )
     parser.add_argument("--sample-rate", type=int, default=16_000)
     parser.add_argument("--speed-of-sound", type=float, default=343.0)
@@ -182,11 +185,19 @@ def build_arg_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--device", default="cuda")
-    parser.add_argument("--checkpoint-dir", default=os.path.join(PROJECT_ROOT, "checkpoints"))
+    parser.add_argument(
+        "--checkpoint-dir",
+        default=os.path.join(PROJECT_ROOT, "checkpoints", MODEL_VARIANT),
+    )
     parser.add_argument("--ckpt-every", type=int, default=10)
     parser.add_argument("--val-every", type=int, default=10)
     parser.add_argument("--log-every", type=int, default=50, help="배치 단위 콘솔 로그 주기")
-    parser.add_argument("--log-csv", default=os.path.join(PROJECT_ROOT, "checkpoints", "train_log.csv"))
+    parser.add_argument(
+        "--log-csv",
+        default=os.path.join(
+            PROJECT_ROOT, "checkpoints", MODEL_VARIANT, "train_log.csv"
+        ),
+    )
     parser.add_argument("--resume", default=None, help="이어서 학습할 checkpoint 경로")
 
     return parser
@@ -443,6 +454,7 @@ def save_checkpoint(
     torch.save(
         {
             "epoch": epoch,
+            "aggregation": encoder.aggregation,
             "encoder": encoder.state_dict(),
             "raw_sigma": raw_sigma.detach().cpu(),
             "optimizer": optimizer.state_dict(),
@@ -466,7 +478,18 @@ def load_checkpoint(
     scheduler: torch.optim.lr_scheduler.LRScheduler,
     device: torch.device
 ) -> int:
-    checkpoint = torch.load(path, map_location=device)
+    # 학습 코드가 직접 저장한 RNG/optimizer 상태까지 복원해야 하므로
+    # PyTorch 2.6+의 weights_only 기본값에 의존하지 않는다.
+    checkpoint = torch.load(path, map_location=device, weights_only=False)
+    checkpoint_aggregation = checkpoint.get("aggregation")
+    if (
+        checkpoint_aggregation is not None
+        and checkpoint_aggregation != encoder.aggregation
+    ):
+        raise ValueError(
+            "checkpoint aggregation mismatch: "
+            f"checkpoint={checkpoint_aggregation!r}, model={encoder.aggregation!r}"
+        )
     encoder.load_state_dict(checkpoint["encoder"])
     with torch.no_grad():
         raw_sigma.copy_(checkpoint["raw_sigma"].to(device))
@@ -646,6 +669,7 @@ def main() -> None:
 
         log_row = {
             "epoch": epoch,
+            "aggregation": encoder.aggregation,
             "profile": profile,
             "beta": beta,
             "lr": optimizer.param_groups[0]["lr"],

@@ -29,9 +29,9 @@ class SimulationConfig:
     wall_absorption_weight: tuple[float, float] = (0.5, 1.0)
     array_position_min_fraction: tuple[float, float, float] = (0.1, 0.1, 0.1)
     array_position_max_fraction: tuple[float, float, float] = (0.9, 0.9, 0.5)
-    trajectory_points: int = 156
-    oscillations: tuple[float, float] = (0.0, 2.0)
-    oscillation_amplitude_m: tuple[float, float] = (0.0, 1.0)
+    trajectory_points: int = 156  # 궤적 지점
+    oscillations: tuple[float, float] = (0.0, 2.0)  # 진동 횟수: 0~2회
+    oscillation_amplitude_m: tuple[float, float] = (0.0, 1.0)  # 진폭: 0~1m 
     static_trajectory_probability: float = 0.0
     noise_min_distance_m: float = 2.5
     noise_wall_margin_m: float = 0.1
@@ -202,6 +202,7 @@ def _sample_trajectory(
     cycles = rng.uniform(*config.oscillations, size=3)
     angular_frequency = 2.0 * np.pi * cycles / config.trajectory_points
 
+    # start와 end 사이 직선 궤적 생성
     trajectory_points = np.stack(
         [
             np.linspace(start[axis], end[axis], config.trajectory_points)
@@ -209,6 +210,8 @@ def _sample_trajectory(
         ],
         axis=1,
     )
+
+    # 축별 sin파 진동 추가
     trajectory_points += amplitude * np.sin(
         angular_frequency * np.arange(config.trajectory_points)[:, None]
     )

@@ -1,10 +1,11 @@
 # Physics-guided-VM
 
-이 브랜치는 **CWSA (channel-wise softmax aggregation)** 모델을 관리한다.
+`main` 브랜치는 SUM과 CWSA 모델을 모두 선택해서 실행할 수 있다.
 
-- encoder aggregation: `cwsa`
-- physics pair reduction 기본값: `mean`
-- KL weight 기본값: `beta / K`
-- checkpoint 기본 경로: `checkpoints/cwsa`
+- SUM: `python train.py --aggregation sum`
+- CWSA: `python train.py --aggregation cwsa`
 
-`train.py`의 `--aggregation`은 이 브랜치에서 `cwsa`로 고정된다.
+기본 aggregation은 `sum`이다. 별도 경로를 지정하지 않으면 결과는 선택한
+방식에 따라 `checkpoints/sum` 또는 `checkpoints/cwsa`에 저장된다.
+
+고정된 모델 버전은 각각 `model-sum`, `model-cwsa` 브랜치에서 관리한다.

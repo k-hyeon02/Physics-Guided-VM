@@ -44,7 +44,7 @@ from model.loss import (
 )
 
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
-MODEL_VARIANT = "cwsa"
+DEFAULT_AGGREGATION = "sum"
 
 def inverse_softplus(value: float) -> float:
     """softplus(x) = value가 되는 x를 계산 (sigma 초기값 설정용)"""
@@ -52,7 +52,7 @@ def inverse_softplus(value: float) -> float:
 
 def build_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Training Physics-based variational model (CWSA branch)"
+        description="Training Physics-based variational model (SUM/CWSA)"
     )
 
     # 데이터 경로
@@ -151,9 +151,9 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--num-delay-bins", type=int, default=64)
     parser.add_argument(
         "--aggregation",
-        default=MODEL_VARIANT,
-        choices=[MODEL_VARIANT],
-        help="encoder pair 집계 (이 브랜치는 channel-wise softmax aggregation으로 고정)",
+        default=DEFAULT_AGGREGATION,
+        choices=["sum", "cwsa"],
+        help="encoder pair 집계: sum=기존 논문 방식, cwsa=channel-wise softmax aggregation",
     )
     parser.add_argument("--sample-rate", type=int, default=16_000)
     parser.add_argument("--speed-of-sound", type=float, default=343.0)
@@ -187,20 +187,32 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--device", default="cuda")
     parser.add_argument(
         "--checkpoint-dir",
-        default=os.path.join(PROJECT_ROOT, "checkpoints", MODEL_VARIANT),
+        default=None,
+        help="기본값: checkpoints/<aggregation>",
     )
     parser.add_argument("--ckpt-every", type=int, default=10)
     parser.add_argument("--val-every", type=int, default=10)
     parser.add_argument("--log-every", type=int, default=50, help="배치 단위 콘솔 로그 주기")
     parser.add_argument(
         "--log-csv",
-        default=os.path.join(
-            PROJECT_ROOT, "checkpoints", MODEL_VARIANT, "train_log.csv"
-        ),
+        default=None,
+        help="기본값: <checkpoint-dir>/train_log.csv",
     )
     parser.add_argument("--resume", default=None, help="이어서 학습할 checkpoint 경로")
 
     return parser
+
+
+def resolve_output_paths(args: argparse.Namespace) -> argparse.Namespace:
+    """선택한 aggregation별로 기본 checkpoint와 log 경로를 분리한다."""
+
+    if args.checkpoint_dir is None:
+        args.checkpoint_dir = os.path.join(
+            PROJECT_ROOT, "checkpoints", args.aggregation
+        )
+    if args.log_csv is None:
+        args.log_csv = os.path.join(args.checkpoint_dir, "train_log.csv")
+    return args
 
 
 def resolve_device(requested: str) -> torch.device:
@@ -581,7 +593,7 @@ def build_training_loaders(args, train_dataset, val_dataset):
 
 
 def main() -> None:
-    args = build_arg_parser().parse_args()
+    args = resolve_output_paths(build_arg_parser().parse_args())
     random.seed(args.seed)
     np.random.seed(args.seed)
     torch.manual_seed(args.seed)

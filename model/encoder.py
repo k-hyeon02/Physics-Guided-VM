@@ -128,7 +128,7 @@ class VariationalDOAEncoder(nn.Module):
         metadata_dim: int = 6,
         gru_layers: int = 2,
         hidden_size: int = 128,
-        aggregation: str = "cwsa",
+        aggregation: str = "sum",
         eps: float = 1e-8,
     ) -> None:
         super().__init__()

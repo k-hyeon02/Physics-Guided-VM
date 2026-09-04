@@ -24,7 +24,7 @@ def channelwise_softmax_aggregation(x: Tensor, pair_dim: int = 1) -> Tensor:
     """CWSA로 pair 축을 softmax 가중합과 가중 표준편차로 집계한다.
 
     Args:
-        x: 일반적으로 ``(B, K, T', H)`` 형태인 pairwise feature.
+        x: 일반적으로 (B, K, T', H) 형태인 pairwise feature.
         pair_dim: 마이크 pair 축의 위치.
 
     Returns:
@@ -33,9 +33,10 @@ def channelwise_softmax_aggregation(x: Tensor, pair_dim: int = 1) -> Tensor:
 
     weights = x.softmax(dim=pair_dim)
     weighted = weights * x
-    total = weighted.sum(dim=pair_dim)
-    spread = weighted.std(dim=pair_dim, unbiased=False)
-    return torch.cat((total, spread), dim=-1)
+    mean = weighted.sum(dim=pair_dim)  # (B, 1, T', H)
+    var = (weights * (x - mean).square()).sum(dim=pair_dim, keepdim=True)
+    std = torch.sqrt(var)
+    return torch.cat((mean, std), dim=-1)
 
 
 class ConvBlock(nn.Module):
@@ -105,7 +106,7 @@ class VariationalDOAEncoder(nn.Module):
         metadata_dim: pairwise metadata (v_i, v_j) 차원
         gru_layers: unidirectional GRU 레이어 수
         hidden_size: GRU/MLP의 공통 hidden 크기
-        aggregation: ``sum``은 기존 단순 합산, ``cwsa``는 channel-wise
+        aggregation: sum은 기존 단순 합산, cwsa는 channel-wise
             softmax 가중합과 가중 표준편차를 사용한다.
         eps: 0-division 및 zero-direction fallback 판정에 쓰는 epsilon
 
